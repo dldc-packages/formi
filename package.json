@@ -1,5 +1,5 @@
 {
-  "name": "zen-form",
+  "name": "@dldc/formi",
   "version": "0.0.0",
   "description": "Parse and build FormData in a type-safe way",
   "keywords": [
@@ -7,13 +7,13 @@
     "formdata",
     "type-safe"
   ],
-  "homepage": "https://github.com/etienne-dldc/zen-form#readme",
+  "homepage": "https://github.com/etienne-dldc/formi#readme",
   "bugs": {
-    "url": "https://github.com/etienne-dldc/zen-form/issues"
+    "url": "https://github.com/etienne-dldc/formi/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/etienne-dldc/zen-form.git"
+    "url": "git+https://github.com/etienne-dldc/formi.git"
   },
   "license": "MIT",
   "author": "Etienne Dldc <e.deladonchamps@gmail.com>",
