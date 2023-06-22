@@ -2,36 +2,36 @@ import { z } from 'zod';
 import {
   ChildrenUpdateFn,
   CreateFieldOptions,
-  IZenFormField,
+  IFormiField,
   InputBase,
   RestoreFromPaths,
   ValidateFailure,
   ValidateFn,
   ValidateResult,
   ValidateSuccess,
-  ZenFormFieldAny,
-} from './ZenFormField.types';
-import { ZenFormFieldTree, ZenFormFieldTreeValue } from './ZenFormFieldTree';
+  FormiFieldAny,
+} from './FormiField.types';
+import { FormiFieldTree, FormiFieldTreeValue } from './FormiFieldTree';
 import {
-  ZenFormIssueBase,
-  ZenFormIssueNonEmptyFile,
-  ZenFormIssueNotFile,
-  ZenFormIssueNotString,
-  ZenFormIssueNumber,
-  ZenFormIssueSingle,
-  ZenFormIssueZod,
-} from './ZenFormIssue';
-import { ZenFormKey } from './ZenFormKey';
+  FormiIssueBase,
+  FormiIssueNonEmptyFile,
+  FormiIssueNotFile,
+  FormiIssueNotString,
+  FormiIssueNumber,
+  FormiIssueSingle,
+  FormiIssueZod,
+} from './FormiIssue';
+import { FormiKey } from './FormiKey';
 import { Path } from './tools/Path';
 
 export const FIELD_TYPES = Symbol('FIELD_TYPES');
 export const FIELD_VALIDATE_FN = Symbol('FIELD_VALIDATE_FN');
 export const FIELD_RESTORE_FROM_PATHS = Symbol('FIELD_RESTORE_FROM_PATHS');
 
-export const ZenFormField = (() => {
+export const FormiField = (() => {
   return {
     utils: {
-      isZenFormField,
+      isFormiField,
       getValidateFn,
       getRestoreFromPaths,
       zodValidator,
@@ -57,15 +57,15 @@ export const ZenFormField = (() => {
     repeat,
   } as const;
 
-  function create<Value, Issue, Children extends ZenFormFieldTree>({
+  function create<Value, Issue, Children extends FormiFieldTree>({
     key,
     children,
     validateFn,
     restoreFromPaths = null,
-  }: CreateFieldOptions<Value, Issue, Children>): IZenFormField<Value, Issue, Children> {
+  }: CreateFieldOptions<Value, Issue, Children>): IFormiField<Value, Issue, Children> {
     const currentValidateFn = validateFn;
 
-    const self: IZenFormField<Value, Issue, Children> = {
+    const self: IFormiField<Value, Issue, Children> = {
       [FIELD_RESTORE_FROM_PATHS]: restoreFromPaths,
       [FIELD_VALIDATE_FN]: currentValidateFn,
       [FIELD_TYPES]: { __value: {} as Value, __issue: {} as Issue },
@@ -81,20 +81,20 @@ export const ZenFormField = (() => {
 
     function clone() {
       return create({
-        key: ZenFormKey(),
-        children: ZenFormFieldTree.clone(children),
+        key: FormiKey(),
+        children: FormiFieldTree.clone(children),
         validateFn: currentValidateFn,
         restoreFromPaths,
       });
     }
 
-    function withIssue<NextIssue>(): IZenFormField<Value, Issue | NextIssue, Children> {
+    function withIssue<NextIssue>(): IFormiField<Value, Issue | NextIssue, Children> {
       return self;
     }
 
     function validate<NextValue = Value, NextIssue = never>(
       validateFn: ValidateFn<Value, NextValue, Issue | NextIssue>
-    ): IZenFormField<NextValue, Issue | NextIssue, Children> {
+    ): IFormiField<NextValue, Issue | NextIssue, Children> {
       const nextValidate = (input: any) => {
         const prev = currentValidateFn(input);
         if (!prev.success) {
@@ -103,14 +103,14 @@ export const ZenFormField = (() => {
         return validateFn(prev.value);
       };
       return create({
-        key: ZenFormKey(),
+        key: FormiKey(),
         children,
         validateFn: nextValidate,
         restoreFromPaths,
       });
     }
 
-    function withChildren(update: Children | ChildrenUpdateFn<Children>): IZenFormField<Value, Issue, Children> {
+    function withChildren(update: Children | ChildrenUpdateFn<Children>): IFormiField<Value, Issue, Children> {
       const nextChildren = typeof update === 'function' ? update(children) : update;
       return create({
         key: self.key,
@@ -122,7 +122,7 @@ export const ZenFormField = (() => {
 
     function zodValidate<NextValue = Value>(
       schema: z.Schema<NextValue>
-    ): IZenFormField<NextValue, Issue | ZenFormIssueZod, Children> {
+    ): IFormiField<NextValue, Issue | FormiIssueZod, Children> {
       return validate(zodValidator(schema));
     }
   }
@@ -130,8 +130,8 @@ export const ZenFormField = (() => {
   // fields
 
   function base() {
-    return create<InputBase<null>, ZenFormIssueBase, null>({
-      key: ZenFormKey(),
+    return create<InputBase<null>, FormiIssueBase, null>({
+      key: FormiKey(),
       children: null,
       validateFn: (input) => success(input),
       restoreFromPaths: null,
@@ -174,24 +174,24 @@ export const ZenFormField = (() => {
     return file().validate(isNonEmptyFile);
   }
 
-  function group<Children extends ZenFormFieldTree>(
+  function group<Children extends FormiFieldTree>(
     children: Children
-  ): IZenFormField<ZenFormFieldTreeValue<Children>, ZenFormIssueBase, Children> {
-    return create<ZenFormFieldTreeValue<Children>, ZenFormIssueBase, Children>({
-      key: ZenFormKey(),
+  ): IFormiField<FormiFieldTreeValue<Children>, FormiIssueBase, Children> {
+    return create<FormiFieldTreeValue<Children>, FormiIssueBase, Children>({
+      key: FormiKey(),
       children,
       validateFn: (input) => success(input.children),
       restoreFromPaths: null,
     });
   }
 
-  function repeat<Child extends ZenFormFieldTree>(
+  function repeat<Child extends FormiFieldTree>(
     child: Child,
     initialCount: number = 1
-  ): IZenFormField<Array<ZenFormFieldTreeValue<Child>>, ZenFormIssueBase, Array<Child>> {
-    const initialChildren = Array.from({ length: initialCount }, () => ZenFormFieldTree.clone(child));
-    return create<Array<ZenFormFieldTreeValue<Child>>, ZenFormIssueBase, Array<Child>>({
-      key: ZenFormKey(),
+  ): IFormiField<Array<FormiFieldTreeValue<Child>>, FormiIssueBase, Array<Child>> {
+    const initialChildren = Array.from({ length: initialCount }, () => FormiFieldTree.clone(child));
+    return create<Array<FormiFieldTreeValue<Child>>, FormiIssueBase, Array<Child>>({
+      key: FormiKey(),
       children: initialChildren,
       validateFn: (input) => success(input.children) as any,
       restoreFromPaths: (paths) => restoreRepeat(child, paths),
@@ -200,7 +200,7 @@ export const ZenFormField = (() => {
 
   // utils
 
-  function restoreRepeat<Child extends ZenFormFieldTree>(child: Child, paths: ReadonlyArray<Path>): Array<Child> {
+  function restoreRepeat<Child extends FormiFieldTree>(child: Child, paths: ReadonlyArray<Path>): Array<Child> {
     let size = 0;
     const pathsByIndex = new Map<number, Array<Path>>();
     for (const path of paths) {
@@ -217,31 +217,31 @@ export const ZenFormField = (() => {
       size = Math.max(size, head + 1);
     }
 
-    return Array.from({ length: size }, () => ZenFormFieldTree.clone(child)).map((child, index) => {
+    return Array.from({ length: size }, () => FormiFieldTree.clone(child)).map((child, index) => {
       const paths = pathsByIndex.get(index) ?? [];
-      return ZenFormFieldTree.restoreFromPaths(child, paths);
+      return FormiFieldTree.restoreFromPaths(child, paths);
     });
   }
 
-  function isZenFormField(field: any): field is IZenFormField<any, any, any> {
+  function isFormiField(field: any): field is IFormiField<any, any, any> {
     return Boolean(field && field[FIELD_TYPES]);
   }
 
-  function getValidateFn(field: ZenFormFieldAny): ValidateFn<any, any, any> {
+  function getValidateFn(field: FormiFieldAny): ValidateFn<any, any, any> {
     return field[FIELD_VALIDATE_FN];
   }
 
-  function getRestoreFromPaths(field: ZenFormFieldAny): RestoreFromPaths<any> | null {
+  function getRestoreFromPaths(field: FormiFieldAny): RestoreFromPaths<any> | null {
     return field[FIELD_RESTORE_FROM_PATHS];
   }
 
-  function zodValidator<T>(schema: z.Schema<T>): ValidateFn<any, T, ZenFormIssueZod> {
+  function zodValidator<T>(schema: z.Schema<T>): ValidateFn<any, T, FormiIssueZod> {
     return (value) => {
       const result = schema.safeParse(value);
       if (result.success) {
         return { success: true, value: result.data };
       }
-      const issues = result.error.issues.map((issue): ZenFormIssueZod => ({ kind: 'ZodIssue', issue }));
+      const issues = result.error.issues.map((issue): FormiIssueZod => ({ kind: 'ZodIssue', issue }));
       if (issues.length === 1) {
         return { success: false, issue: issues[0] };
       }
@@ -249,7 +249,7 @@ export const ZenFormField = (() => {
     };
   }
 
-  function isSingleValue(input: InputBase<null>): ValidateResult<FormDataEntryValue | null, ZenFormIssueSingle> {
+  function isSingleValue(input: InputBase<null>): ValidateResult<FormDataEntryValue | null, FormiIssueSingle> {
     if (input.values === null) {
       return success(null);
     }
@@ -262,39 +262,39 @@ export const ZenFormField = (() => {
     return failure({ kind: 'UnexpectedMultipleValues' });
   }
 
-  function isNotNull<Value>(input: Value | null): ValidateResult<Value, ZenFormIssueBase> {
+  function isNotNull<Value>(input: Value | null): ValidateResult<Value, FormiIssueBase> {
     if (input === null) {
-      return failure<ZenFormIssueBase>({ kind: 'MissingField' });
+      return failure<FormiIssueBase>({ kind: 'MissingField' });
     }
     return success<Value>(input);
   }
 
-  function isNotFile<Value>(input: Value | File): ValidateResult<Value, ZenFormIssueNotFile> {
+  function isNotFile<Value>(input: Value | File): ValidateResult<Value, FormiIssueNotFile> {
     if (input instanceof File) {
-      return failure<ZenFormIssueNotFile>({ kind: 'UnexpectedFile' });
+      return failure<FormiIssueNotFile>({ kind: 'UnexpectedFile' });
     }
     return success<Value>(input);
   }
 
-  function isNumber(input: string | null): ValidateResult<number | null, ZenFormIssueNumber> {
+  function isNumber(input: string | null): ValidateResult<number | null, FormiIssueNumber> {
     if (input === '' || input === null) {
       return success<number | null>(null);
     }
     const numberValue = Number(input);
     if (Number.isNaN(numberValue)) {
-      return failure<ZenFormIssueNumber>({ kind: 'InvalidNumber', value: input });
+      return failure<FormiIssueNumber>({ kind: 'InvalidNumber', value: input });
     }
     return success<number>(numberValue);
   }
 
-  function isDefined(input: any): ValidateResult<boolean, ZenFormIssueBase> {
+  function isDefined(input: any): ValidateResult<boolean, FormiIssueBase> {
     if (input === null || input === undefined) {
       return success(false);
     }
     return success(true);
   }
 
-  function isFile(entry: FormDataEntryValue | null): ValidateResult<File, ZenFormIssueNotString> {
+  function isFile(entry: FormDataEntryValue | null): ValidateResult<File, FormiIssueNotString> {
     if (entry === null) {
       return { success: false, issue: { kind: 'MissingField' } };
     }
@@ -304,9 +304,9 @@ export const ZenFormField = (() => {
     return { success: true, value: entry };
   }
 
-  function isNonEmptyFile(input: File): ValidateResult<File, ZenFormIssueNonEmptyFile> {
+  function isNonEmptyFile(input: File): ValidateResult<File, FormiIssueNonEmptyFile> {
     if (input.size === 0) {
-      return failure<ZenFormIssueNonEmptyFile>({ kind: 'EmptyFile' });
+      return failure<FormiIssueNonEmptyFile>({ kind: 'EmptyFile' });
     }
     return success(input);
   }

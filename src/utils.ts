@@ -1,4 +1,4 @@
-import { ZenFormInternalErrors } from './ZenFormError';
+import { FormiInternalErrors } from './FormiError';
 
 export const nanoid = (() => {
   // https://github.com/ai/nanoid/blob/main/non-secure/index.js
@@ -22,7 +22,7 @@ export function expectNever(val: never, inner?: (val: any) => void): never {
   if (inner) {
     inner(val);
   }
-  throw ZenFormInternalErrors.Internal_UnexpectedNever.create(val);
+  throw FormiInternalErrors.Internal_UnexpectedNever.create(val);
 }
 
 export function shallowEqual(left: any, right: any): boolean {

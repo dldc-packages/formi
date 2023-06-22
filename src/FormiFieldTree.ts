@@ -1,27 +1,27 @@
-import { ZenFormErrors } from './ZenFormError';
-import { ZenFormField } from './ZenFormField';
-import { IZenFormField, ZenFormFieldAny } from './ZenFormField.types';
+import { FormiErrors } from './FormiError';
+import { FormiField } from './FormiField';
+import { IFormiField, FormiFieldAny } from './FormiField.types';
 import { Path } from './tools/Path';
 
-export type ZenFormFieldTree = null | ZenFormFieldAny | ZenFormFieldTree[] | { [key: string]: ZenFormFieldTree };
+export type FormiFieldTree = null | FormiFieldAny | FormiFieldTree[] | { [key: string]: FormiFieldTree };
 
-// export type ZenFormFieldTreeIssue<Tree extends ZenFormFieldTree> = Tree extends ZenFormFieldAny
-//   ? ZenFormFieldIssue<Tree> | ZenFormFieldTreeIssue<Tree['children']>
-//   : Tree extends Array<infer Inner extends ZenFormFieldTree>
-//   ? ZenFormFieldTreeIssue<Inner>
-//   : Tree extends Record<string, ZenFormFieldAny>
-//   ? { [K in keyof Tree]: ZenFormFieldTreeIssue<Tree[K]> }[keyof Tree]
+// export type FormiFieldTreeIssue<Tree extends FormiFieldTree> = Tree extends FormiFieldAny
+//   ? FormiFieldIssue<Tree> | FormiFieldTreeIssue<Tree['children']>
+//   : Tree extends Array<infer Inner extends FormiFieldTree>
+//   ? FormiFieldTreeIssue<Inner>
+//   : Tree extends Record<string, FormiFieldAny>
+//   ? { [K in keyof Tree]: FormiFieldTreeIssue<Tree[K]> }[keyof Tree]
 //   : never;
 
-export type ZenFormFieldTreeValue<Tree extends ZenFormFieldTree> = Tree extends IZenFormField<infer V, any, any>
+export type FormiFieldTreeValue<Tree extends FormiFieldTree> = Tree extends IFormiField<infer V, any, any>
   ? V
-  : Tree extends Array<infer Inner extends ZenFormFieldTree>
-  ? ReadonlyArray<ZenFormFieldTreeValue<Inner>>
-  : Tree extends { [key: string]: ZenFormFieldAny }
-  ? { readonly [K in keyof Tree]: ZenFormFieldTreeValue<Tree[K]> }
+  : Tree extends Array<infer Inner extends FormiFieldTree>
+  ? ReadonlyArray<FormiFieldTreeValue<Inner>>
+  : Tree extends { [key: string]: FormiFieldAny }
+  ? { readonly [K in keyof Tree]: FormiFieldTreeValue<Tree[K]> }
   : null;
 
-export const ZenFormFieldTree = (() => {
+export const FormiFieldTree = (() => {
   return {
     traverse,
     findByPath,
@@ -36,14 +36,14 @@ export const ZenFormFieldTree = (() => {
   /**
    * Wrap fields in a group if they are not already a group or a single fields.
    */
-  function wrap(fields: ZenFormFieldTree): ZenFormFieldAny {
-    if (ZenFormField.utils.isZenFormField(fields)) {
+  function wrap(fields: FormiFieldTree): FormiFieldAny {
+    if (FormiField.utils.isFormiField(fields)) {
       return fields;
     }
-    return ZenFormField.group(fields);
+    return FormiField.group(fields);
   }
 
-  function unwrap(fields: ZenFormFieldAny, wrapped: boolean): ZenFormFieldTree {
+  function unwrap(fields: FormiFieldAny, wrapped: boolean): FormiFieldTree {
     if (wrapped) {
       return fields.children;
     }
@@ -51,10 +51,10 @@ export const ZenFormFieldTree = (() => {
   }
 
   function traverse<T>(
-    tree: ZenFormFieldTree,
-    visitor: (field: ZenFormFieldAny, path: Path, next: () => Array<T>) => T
+    tree: FormiFieldTree,
+    visitor: (field: FormiFieldAny, path: Path, next: () => Array<T>) => T
   ): Array<T> {
-    function next(current: ZenFormFieldTree, base: Path): Array<T> {
+    function next(current: FormiFieldTree, base: Path): Array<T> {
       return getChildren(current, base).map(({ item, path }) => {
         return visitor(item, path, () => next(item.children, path));
       });
@@ -62,11 +62,11 @@ export const ZenFormFieldTree = (() => {
     return next(tree, Path());
   }
 
-  function getChildren(tree: ZenFormFieldTree, base: Path): Array<{ path: Path; item: ZenFormFieldAny }> {
+  function getChildren(tree: FormiFieldTree, base: Path): Array<{ path: Path; item: FormiFieldAny }> {
     if (tree === null) {
       return [];
     }
-    if (ZenFormField.utils.isZenFormField(tree)) {
+    if (FormiField.utils.isFormiField(tree)) {
       return [{ path: base, item: tree }];
     }
     if (Array.isArray(tree)) {
@@ -75,7 +75,7 @@ export const ZenFormFieldTree = (() => {
     return Object.entries(tree).flatMap(([key, item]) => getChildren(item, base.append(key)));
   }
 
-  function fieldPath(tree: ZenFormFieldTree, field: ZenFormFieldAny): Path | null {
+  function fieldPath(tree: FormiFieldTree, field: FormiFieldAny): Path | null {
     const found: Array<Path> = [];
     traverse(tree, (item, path, next) => {
       if (item === field) {
@@ -87,16 +87,16 @@ export const ZenFormFieldTree = (() => {
       return null;
     }
     if (found.length > 1) {
-      throw ZenFormErrors.ReusedField.create(tree, field, found);
+      throw FormiErrors.ReusedField.create(tree, field, found);
     }
     return found[0];
   }
 
-  function getChildrenByKey(tree: ZenFormFieldTree, key: string | number): ZenFormFieldTree | null {
+  function getChildrenByKey(tree: FormiFieldTree, key: string | number): FormiFieldTree | null {
     if (tree === null) {
       return null;
     }
-    if (ZenFormField.utils.isZenFormField(tree)) {
+    if (FormiField.utils.isFormiField(tree)) {
       return getChildrenByKey(tree.children, key);
     }
     if (Array.isArray(tree)) {
@@ -111,7 +111,7 @@ export const ZenFormFieldTree = (() => {
     return tree[key] ?? null;
   }
 
-  function findByPath(tree: ZenFormFieldTree, path: Path): ZenFormFieldAny | null {
+  function findByPath(tree: FormiFieldTree, path: Path): FormiFieldAny | null {
     const pathResolved = Path.from(path);
     let current = tree;
     for (const pathItem of pathResolved) {
@@ -121,17 +121,17 @@ export const ZenFormFieldTree = (() => {
       }
       current = next;
     }
-    if (ZenFormField.utils.isZenFormField(current)) {
+    if (FormiField.utils.isFormiField(current)) {
       return current;
     }
     return null;
   }
 
-  function clone<Tree extends ZenFormFieldTree>(tree: Tree): Tree {
+  function clone<Tree extends FormiFieldTree>(tree: Tree): Tree {
     if (tree === null) {
       return tree;
     }
-    if (ZenFormField.utils.isZenFormField(tree)) {
+    if (FormiField.utils.isFormiField(tree)) {
       return tree.clone() as Tree;
     }
     if (Array.isArray(tree)) {
@@ -140,13 +140,13 @@ export const ZenFormFieldTree = (() => {
     return Object.fromEntries(Object.entries(tree).map(([key, value]) => [key, clone(value)])) as Tree;
   }
 
-  function restoreFromPaths<Tree extends ZenFormFieldTree>(tree: Tree, paths: ReadonlyArray<Path>): Tree {
+  function restoreFromPaths<Tree extends FormiFieldTree>(tree: Tree, paths: ReadonlyArray<Path>): Tree {
     if (tree === null) {
       return tree;
     }
-    if (ZenFormField.utils.isZenFormField(tree)) {
-      const restore = ZenFormField.utils.getRestoreFromPaths(tree);
-      return tree.withChildren((prev: ZenFormFieldTree) => {
+    if (FormiField.utils.isFormiField(tree)) {
+      const restore = FormiField.utils.getRestoreFromPaths(tree);
+      return tree.withChildren((prev: FormiFieldTree) => {
         if (!restore) {
           return restoreFromPaths(prev, paths);
         }
@@ -167,7 +167,7 @@ export const ZenFormFieldTree = (() => {
         }
         list.push(rest);
       }
-      return tree.map((item, index): ZenFormFieldTree => {
+      return tree.map((item, index): FormiFieldTree => {
         const paths = pathsByIndex.get(index) ?? [];
         return restoreFromPaths(item, paths);
       }) as Tree;
@@ -187,7 +187,7 @@ export const ZenFormFieldTree = (() => {
       list.push(rest);
     }
     return Object.fromEntries(
-      Object.entries(tree).map(([key, value]): [string, ZenFormFieldTree] => {
+      Object.entries(tree).map(([key, value]): [string, FormiFieldTree] => {
         const paths = pathsByKey.get(key) ?? [];
         return [key, restoreFromPaths(value, paths)];
       })

@@ -1,16 +1,16 @@
 import { describe, expect, test, vi } from 'vitest';
-import { Path, ZenFormField, ZenFormFieldTree } from '../src/mod';
+import { Path, FormiField, FormiFieldTree } from '../src/mod';
 
 test('Traverse', () => {
   const tree = {
-    a: [ZenFormField.value(), ZenFormField.value()],
-    b: ZenFormField.value(),
-    c: ZenFormField.group(null),
+    a: [FormiField.value(), FormiField.value()],
+    b: FormiField.value(),
+    c: FormiField.group(null),
   };
 
   const onTraverse = vi.fn();
 
-  ZenFormFieldTree.traverse(tree, onTraverse);
+  FormiFieldTree.traverse(tree, onTraverse);
 
   const expectedNextFn = expect.any(Function);
 
@@ -23,10 +23,10 @@ test('Traverse', () => {
 
 test('Traverse nested fields', () => {
   const tree = {
-    a1: [ZenFormField.value(), ZenFormField.value()],
-    a2: ZenFormField.group({
-      b1: ZenFormField.value(),
-      b2: ZenFormField.group(null),
+    a1: [FormiField.value(), FormiField.value()],
+    a2: FormiField.group({
+      b1: FormiField.value(),
+      b2: FormiField.group(null),
       b3: null,
       b4: null,
     }),
@@ -37,7 +37,7 @@ test('Traverse nested fields', () => {
     return null;
   });
 
-  ZenFormFieldTree.traverse(tree, onTraverse);
+  FormiFieldTree.traverse(tree, onTraverse);
 
   expect(onTraverse).toHaveBeenCalledTimes(5);
   const fields = onTraverse.mock.calls.map((args) => args[0]);
@@ -46,39 +46,39 @@ test('Traverse nested fields', () => {
 
 test('Find path', () => {
   const tree = {
-    a1: [ZenFormField.value(), ZenFormField.value()],
-    a2: ZenFormField.group({
-      b1: ZenFormField.value(),
-      b2: ZenFormField.group(null),
+    a1: [FormiField.value(), FormiField.value()],
+    a2: FormiField.group({
+      b1: FormiField.value(),
+      b2: FormiField.group(null),
       b3: null,
     }),
   };
 
-  expect(ZenFormFieldTree.fieldPath(tree, tree.a1[0])?.raw).toEqual(['a1', 0]);
-  expect(ZenFormFieldTree.fieldPath(tree, tree.a1[1])?.raw).toEqual(['a1', 1]);
-  expect(ZenFormFieldTree.fieldPath(tree, tree.a2.children.b1)?.raw).toEqual(['a2', 'b1']);
-  expect(ZenFormFieldTree.fieldPath(tree, tree.a2.children.b2)?.raw).toEqual(['a2', 'b2']);
+  expect(FormiFieldTree.fieldPath(tree, tree.a1[0])?.raw).toEqual(['a1', 0]);
+  expect(FormiFieldTree.fieldPath(tree, tree.a1[1])?.raw).toEqual(['a1', 1]);
+  expect(FormiFieldTree.fieldPath(tree, tree.a2.children.b1)?.raw).toEqual(['a2', 'b1']);
+  expect(FormiFieldTree.fieldPath(tree, tree.a2.children.b2)?.raw).toEqual(['a2', 'b2']);
 });
 
-describe('ZenFormFieldTree.restoreFromPaths', () => {
+describe('FormiFieldTree.restoreFromPaths', () => {
   test('Restore simple tree', () => {
-    const tree: ZenFormFieldTree = {
-      foo: ZenFormField.value(),
-      bar: ZenFormField.value(),
+    const tree: FormiFieldTree = {
+      foo: FormiField.value(),
+      bar: FormiField.value(),
     };
 
-    const result = ZenFormFieldTree.restoreFromPaths(tree, []) as any;
+    const result = FormiFieldTree.restoreFromPaths(tree, []) as any;
     expect(result).toEqual({ foo: expect.anything(), bar: expect.anything() });
-    expect(ZenFormField.utils.isZenFormField(result.foo)).toBe(true);
-    expect(ZenFormField.utils.isZenFormField(result.bar)).toBe(true);
+    expect(FormiField.utils.isFormiField(result.foo)).toBe(true);
+    expect(FormiField.utils.isFormiField(result.bar)).toBe(true);
   });
 
   test('Restore repeat', () => {
-    const tree: ZenFormFieldTree = {
-      repeat: ZenFormField.repeat(ZenFormField.value()),
+    const tree: FormiFieldTree = {
+      repeat: FormiField.repeat(FormiField.value()),
     };
 
-    const result = ZenFormFieldTree.restoreFromPaths(tree, [
+    const result = FormiFieldTree.restoreFromPaths(tree, [
       Path.from(['repeat', 0]),
       Path.from(['repeat', 1]),
       Path.from(['repeat', 2]),
@@ -87,13 +87,13 @@ describe('ZenFormFieldTree.restoreFromPaths', () => {
   });
 
   test('Restore repeat with object', () => {
-    const tree: ZenFormFieldTree = {
-      repeat: ZenFormField.repeat({
-        foo: ZenFormField.value(),
+    const tree: FormiFieldTree = {
+      repeat: FormiField.repeat({
+        foo: FormiField.value(),
       }),
     };
 
-    const result = ZenFormFieldTree.restoreFromPaths(tree, [
+    const result = FormiFieldTree.restoreFromPaths(tree, [
       Path.from(['repeat', 0, 'foo']),
       Path.from(['repeat', 1, 'foo']),
       Path.from(['repeat', 2, 'foo']),

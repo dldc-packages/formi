@@ -1,34 +1,30 @@
 import { Subscription } from 'suub';
-import { ZenFormErrors, ZenFormInternalErrors } from './ZenFormError';
-import { ZenFormField } from './ZenFormField';
-import { InputBase, ZenFormFieldAny } from './ZenFormField.types';
-import { ZenFormFieldTree } from './ZenFormFieldTree';
-import { ZenFormIssue, ZenFormIssueBase, ZenFormIssues } from './ZenFormIssue';
-import { ZenFormKey } from './ZenFormKey';
+import { FormiErrors, FormiInternalErrors } from './FormiError';
+import { FormiField } from './FormiField';
+import { InputBase, FormiFieldAny } from './FormiField.types';
+import { FormiFieldTree } from './FormiFieldTree';
+import { FormiIssue, FormiIssueBase, FormiIssues } from './FormiIssue';
+import { FormiKey } from './FormiKey';
 import {
   DebugStateResult,
   FieldStateAny,
   FieldsStateMap,
   FieldsStateMapDraft,
-  IZenFormStore,
-  RootZenFormField,
-  ZenFormState,
-  ZenFormStoreActions,
-} from './ZenFormStore.types';
+  IFormiStore,
+  RootFormiField,
+  FormiState,
+  FormiStoreActions,
+} from './FormiStore.types';
 import { ImmuWeakMap } from './tools/ImmuWeakMap';
 import { Path } from './tools/Path';
 import { expectNever, isSetEqual, shallowEqual } from './utils';
 
-export const ZenFormStore = (() => {
+export const FormiStore = (() => {
   return create;
 
-  function create(
-    formName: string,
-    initialFields: ZenFormFieldTree,
-    issues: ZenFormIssues<any> | undefined
-  ): IZenFormStore {
-    let state: ZenFormState = createInitialState(formName, initialFields, issues);
-    const subscription = Subscription<ZenFormState>();
+  function create(formName: string, initialFields: FormiFieldTree, issues: FormiIssues<any> | undefined): IFormiStore {
+    let state: FormiState = createInitialState(formName, initialFields, issues);
+    const subscription = Subscription<FormiState>();
 
     return {
       subscribe: subscription.subscribe,
@@ -42,8 +38,8 @@ export const ZenFormStore = (() => {
       logDegugState,
     };
 
-    function dispatch(action: ZenFormStoreActions): ZenFormState {
-      let nextState: ZenFormState;
+    function dispatch(action: FormiStoreActions): FormiState {
+      let nextState: FormiState;
       try {
         nextState = reducer(state, action);
       } catch (error) {
@@ -57,14 +53,14 @@ export const ZenFormStore = (() => {
       return state;
     }
 
-    function getState(): ZenFormState {
+    function getState(): FormiState {
       return state;
     }
 
-    function reducer(state: ZenFormState, action: ZenFormStoreActions): ZenFormState {
+    function reducer(state: FormiState, action: FormiStoreActions): FormiState {
       if (action.type === 'Mount') {
         return updateStates(state, (draft, fields) => {
-          ZenFormFieldTree.traverse<void>(fields, (field, _path, next) => {
+          FormiFieldTree.traverse<void>(fields, (field, _path, next) => {
             // mount children first
             next();
             draft.updateOrThrow(field.key, (prev) => {
@@ -84,10 +80,10 @@ export const ZenFormStore = (() => {
         });
       }
       if (action.type === 'Change') {
-        const tree = ZenFormFieldTree.unwrap(state.rootField, state.rootFieldWrapped);
+        const tree = FormiFieldTree.unwrap(state.rootField, state.rootFieldWrapped);
         const keys = action.fields ? new Set(action.fields.map((f) => f.key)) : null;
         return updateStates(state, (draft) => {
-          ZenFormFieldTree.traverse<boolean>(tree, (field, _path, next) => {
+          FormiFieldTree.traverse<boolean>(tree, (field, _path, next) => {
             const childrenUpdated = next().some((v) => v);
             const shouldUpdateSelf = keys === null || keys.has(field.key);
             const shouldUpdate = shouldUpdateSelf || childrenUpdated;
@@ -117,7 +113,7 @@ export const ZenFormStore = (() => {
       }
       if (action.type === 'Submit') {
         return updateStates(state, (draft, fields) => {
-          ZenFormFieldTree.traverse(fields, (field, _path, next) => {
+          FormiFieldTree.traverse(fields, (field, _path, next) => {
             next();
             draft.updateOrThrow(field.key, (prev) => {
               if (prev.hasExternalIssues) {
@@ -138,7 +134,7 @@ export const ZenFormStore = (() => {
       }
       if (action.type === 'Reset') {
         return updateStates(state, (draft, fields) => {
-          ZenFormFieldTree.traverse(fields, (field, _path, next) => {
+          FormiFieldTree.traverse(fields, (field, _path, next) => {
             next();
             draft.updateOrThrow(field.key, (prev): FieldStateAny => {
               const inputRes = getInput(draft, field, action.data);
@@ -161,7 +157,7 @@ export const ZenFormStore = (() => {
       }
       if (action.type === 'SetIssues') {
         return updateStates(state, (draft, fields) => {
-          ZenFormFieldTree.traverse(fields, (field, path, next) => {
+          FormiFieldTree.traverse(fields, (field, path, next) => {
             next();
             draft.updateOrThrow(field.key, (prev) => {
               const issues = getFieldIssues(path, action.issues);
@@ -183,12 +179,12 @@ export const ZenFormStore = (() => {
         });
       }
       if (action.type === 'SetFields') {
-        const prevFields = ZenFormFieldTree.unwrap(state.rootField, state.rootFieldWrapped);
+        const prevFields = FormiFieldTree.unwrap(state.rootField, state.rootFieldWrapped);
         const nextFields = typeof action.fields === 'function' ? action.fields(prevFields) : action.fields;
         if (nextFields === prevFields) {
           return state;
         }
-        const nextRootField = ZenFormFieldTree.wrap(nextFields);
+        const nextRootField = FormiFieldTree.wrap(nextFields);
         const draft = state.states.draft();
         traverseWithKeys(formName, nextRootField, (field, path, keys) => {
           draft.update(field.key, (prev) => {
@@ -216,32 +212,32 @@ export const ZenFormStore = (() => {
         };
       }
       return expectNever(action, (action) => {
-        throw ZenFormInternalErrors.Internal_UnhandledAction.create(action);
+        throw FormiInternalErrors.Internal_UnhandledAction.create(action);
       });
     }
 
     function updateStates(
-      state: ZenFormState,
-      updater: (draft: FieldsStateMapDraft, fields: RootZenFormField) => void
-    ): ZenFormState {
+      state: FormiState,
+      updater: (draft: FieldsStateMapDraft, fields: RootFormiField) => void
+    ): FormiState {
       const draft = state.states.draft();
       updater(draft, state.rootField);
       const nextStates = commiStatesDraft(draft, state.rootField);
       if (nextStates === state.states) {
         return state;
       }
-      const result: ZenFormState = { ...state, states: nextStates };
+      const result: FormiState = { ...state, states: nextStates };
       return result;
     }
 
     function createInitialState(
       formName: string,
-      fields: ZenFormFieldTree,
-      issues: ZenFormIssues<any> | undefined
-    ): ZenFormState {
-      const map = ImmuWeakMap.empty<ZenFormKey, FieldStateAny>();
+      fields: FormiFieldTree,
+      issues: FormiIssues<any> | undefined
+    ): FormiState {
+      const map = ImmuWeakMap.empty<FormiKey, FieldStateAny>();
       const draft = map.draft();
-      const rootField = ZenFormFieldTree.wrap(fields);
+      const rootField = FormiFieldTree.wrap(fields);
       initializeFieldStateMap(formName, rootField, draft, issues);
       return {
         rootFieldWrapped: rootField !== fields,
@@ -250,12 +246,12 @@ export const ZenFormStore = (() => {
       };
     }
 
-    function commiStatesDraft(draft: FieldsStateMapDraft, rootField: RootZenFormField): FieldsStateMap {
+    function commiStatesDraft(draft: FieldsStateMapDraft, rootField: RootFormiField): FieldsStateMap {
       const rootState = draft.getOrThrow(rootField.key);
       return draft.commit(rootState.keys);
     }
 
-    function getFieldIssues(path: Path, issues: ZenFormIssues<any> | undefined) {
+    function getFieldIssues(path: Path, issues: FormiIssues<any> | undefined) {
       const initialIssues = issues
         ?.filter((item) => Path.equal(item.path, path))
         .map((item) => item.issues)
@@ -265,10 +261,10 @@ export const ZenFormStore = (() => {
     }
 
     function createFieldState(
-      field: ZenFormFieldAny,
+      field: FormiFieldAny,
       path: Path,
-      keys: Set<ZenFormKey>,
-      issues: ZenFormIssues<any> | undefined
+      keys: Set<FormiKey>,
+      issues: FormiIssues<any> | undefined
     ): FieldStateAny {
       const issuesResolved = getFieldIssues(path, issues);
       return {
@@ -291,9 +287,9 @@ export const ZenFormStore = (() => {
 
     function initializeFieldStateMap(
       formName: string,
-      tree: ZenFormFieldTree,
+      tree: FormiFieldTree,
       draft: FieldsStateMapDraft,
-      issues: ZenFormIssues<any> | undefined
+      issues: FormiIssues<any> | undefined
     ): void {
       traverseWithKeys(formName, tree, (field, path, keys) => {
         const state = createFieldState(field, path, keys, issues);
@@ -308,19 +304,19 @@ export const ZenFormStore = (() => {
      */
     function traverseWithKeys(
       formName: string,
-      tree: ZenFormFieldTree,
-      visitor: (field: ZenFormFieldAny, path: Path, keys: Set<ZenFormKey>) => void
+      tree: FormiFieldTree,
+      visitor: (field: FormiFieldAny, path: Path, keys: Set<FormiKey>) => void
     ) {
-      ZenFormFieldTree.traverse<{ path: Path; keys: Set<ZenFormKey> }>(tree, (field, path, next) => {
+      FormiFieldTree.traverse<{ path: Path; keys: Set<FormiKey> }>(tree, (field, path, next) => {
         const sub = next();
-        const keysMap = new Map<ZenFormKey, Path>();
+        const keysMap = new Map<FormiKey, Path>();
         const formPath = path.prepend(formName);
         keysMap.set(field.key, formPath);
         sub.forEach((item) => {
           item.keys.forEach((key) => {
             const current = keysMap.get(key);
             if (current) {
-              throw ZenFormInternalErrors.Internal_DuplicateKey.create(key, current, item.path);
+              throw FormiInternalErrors.Internal_DuplicateKey.create(key, current, item.path);
             }
             keysMap.set(key, item.path);
           });
@@ -336,17 +332,17 @@ export const ZenFormStore = (() => {
       | { status: 'error'; issues: any[] }
       | { status: 'unkown' };
 
-    function runValidate(field: ZenFormFieldAny, input: GetInputResult): ValidateResult {
+    function runValidate(field: FormiFieldAny, input: GetInputResult): ValidateResult {
       if (input.resolved === false) {
         // Don't run validate if children are not resolved
         return { status: 'unkown' };
       }
-      const validateFn = ZenFormField.utils.getValidateFn(field);
+      const validateFn = FormiField.utils.getValidateFn(field);
       try {
         const result = validateFn(input.input as any);
         if (result.success) {
           if (result.value === undefined) {
-            throw ZenFormErrors.ValidateSuccessWithoutValue.create(field, input.input);
+            throw FormiErrors.ValidateSuccessWithoutValue.create(field, input.input);
           }
           return { status: 'success', value: result.value };
         }
@@ -359,18 +355,18 @@ export const ZenFormStore = (() => {
         }
         return { status: 'error', issues };
       } catch (error) {
-        const issue: ZenFormIssueBase = { kind: 'ValidationError', error };
+        const issue: FormiIssueBase = { kind: 'ValidationError', error };
         return { status: 'error', issues: [issue] };
       }
     }
 
     type GetInputTreeResult = { resolved: false; input: null } | { resolved: true; input: unknown };
 
-    function getTreeInput(draft: FieldsStateMapDraft, field: ZenFormFieldTree): GetInputTreeResult {
+    function getTreeInput(draft: FieldsStateMapDraft, field: FormiFieldTree): GetInputTreeResult {
       if (field === null) {
         return { resolved: true, input: null };
       }
-      if (ZenFormField.utils.isZenFormField(field)) {
+      if (FormiField.utils.isFormiField(field)) {
         const state = draft.getOrThrow(field.key);
         const value = getValue(state);
         if (value.resolved === false) {
@@ -400,9 +396,9 @@ export const ZenFormStore = (() => {
       return { resolved: true, input };
     }
 
-    type GetInputResult = { resolved: false; input: null } | { resolved: true; input: InputBase<ZenFormFieldTree> };
+    type GetInputResult = { resolved: false; input: null } | { resolved: true; input: InputBase<FormiFieldTree> };
 
-    function getInput(draft: FieldsStateMapDraft, field: ZenFormFieldAny, data: FormData): GetInputResult {
+    function getInput(draft: FieldsStateMapDraft, field: FormiFieldAny, data: FormData): GetInputResult {
       const state = draft.getOrThrow(field.key);
       const values = data.getAll(state.name);
       const children = getTreeInput(draft, field.children);
@@ -470,7 +466,7 @@ export const ZenFormStore = (() => {
     function hasErrors(): boolean {
       let errorFound = false;
       const { states, rootField } = getState();
-      ZenFormFieldTree.traverse(rootField, (field, _path, next) => {
+      FormiFieldTree.traverse(rootField, (field, _path, next) => {
         if (errorFound) {
           return;
         }
@@ -492,22 +488,22 @@ export const ZenFormStore = (() => {
       const { states, rootField } = getState();
       const rootState = states.getOrThrow(rootField.key);
       if (rootState.isMounted === false) {
-        throw ZenFormErrors.GetValueUnmountedForm.create(formName);
+        throw FormiErrors.GetValueUnmountedForm.create(formName);
       }
       if (rootState.value === undefined) {
-        throw ZenFormErrors.GetValueUnresolved.create(formName);
+        throw FormiErrors.GetValueUnresolved.create(formName);
       }
       return rootState.value;
     }
 
-    function getIssuesOrThrow(): ZenFormIssues<any> {
+    function getIssuesOrThrow(): FormiIssues<any> {
       const { states, rootField } = getState();
-      const issues: ZenFormIssues<any> = [];
-      ZenFormFieldTree.traverse(rootField, (field, path, next) => {
+      const issues: FormiIssues<any> = [];
+      FormiFieldTree.traverse(rootField, (field, path, next) => {
         next();
         const fieldState = states.getOrThrow(field.key);
         if (fieldState.isMounted === false) {
-          const issue: ZenFormIssue = { kind: 'FieldNotMounted' };
+          const issue: FormiIssue = { kind: 'FieldNotMounted' };
           issues.push({ path: path.raw, issues: [issue] });
           return;
         }
@@ -518,10 +514,10 @@ export const ZenFormStore = (() => {
       return issues;
     }
 
-    function debugState(state: ZenFormState): DebugStateResult {
-      const result: Array<{ field: ZenFormFieldAny; state: FieldStateAny }> = [];
+    function debugState(state: FormiState): DebugStateResult {
+      const result: Array<{ field: FormiFieldAny; state: FieldStateAny }> = [];
       const { rootField, states } = state;
-      ZenFormFieldTree.traverse(rootField, (field, _path, next) => {
+      FormiFieldTree.traverse(rootField, (field, _path, next) => {
         const state = states.get(field.key) as FieldStateAny;
         result.push({ field, state });
         next();
@@ -529,9 +525,9 @@ export const ZenFormStore = (() => {
       return result;
     }
 
-    function logDegugState(state: ZenFormState): void {
+    function logDegugState(state: FormiState): void {
       const result = debugState(state);
-      console.group('ZenFormState');
+      console.group('FormiState');
       console.groupCollapsed('Fields');
       logTree(state.rootField);
       console.groupEnd();
@@ -545,12 +541,12 @@ export const ZenFormStore = (() => {
       console.groupEnd();
       console.groupEnd();
 
-      function logTree(tree: ZenFormFieldTree) {
+      function logTree(tree: FormiFieldTree) {
         if (tree === null) {
           console.log('null');
           return;
         }
-        if (ZenFormField.utils.isZenFormField(tree)) {
+        if (FormiField.utils.isFormiField(tree)) {
           if (tree.children === null) {
             console.log(tree.key.id, tree);
             return;

@@ -1,10 +1,5 @@
 import { ErreurType } from 'erreur';
 
-// export const ImmuWeakMapErrors = new ErreursMap({
-//   MissingKey: (key: any) => ({ message: `Unexpected missing key "${key}"`, key }),
-//   CannotUpdateUnregisteredKey: (key: any) => ({ message: `Cannot update unregistered key "${key}"`, key }),
-// });
-
 export interface IMissingKeyError {
   key: any;
 }

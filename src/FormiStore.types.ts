@@ -1,26 +1,26 @@
 import { SubscribeMethod } from 'suub';
-import { FieldsUpdateFn } from './ZenFormController.types';
+import { FieldsUpdateFn } from './FormiController.types';
 import {
-  IZenFormField,
+  IFormiField,
   InputBase,
-  ZenFormFieldAny,
-  ZenFormFieldChildren,
-  ZenFormFieldIssue,
-  ZenFormFieldValue,
-} from './ZenFormField.types';
-import { ZenFormFieldTree } from './ZenFormFieldTree';
-import { ZenFormIssues } from './ZenFormIssue';
-import { ZenFormKey } from './ZenFormKey';
+  FormiFieldAny,
+  FormiFieldChildren,
+  FormiFieldIssue,
+  FormiFieldValue,
+} from './FormiField.types';
+import { FormiFieldTree } from './FormiFieldTree';
+import { FormiIssues } from './FormiIssue';
+import { FormiKey } from './FormiKey';
 import { ImmuWeakMap, ImmuWeakMapDraft } from './tools/ImmuWeakMap';
 import { Path } from './tools/Path';
 
-export interface IFieldState<Value, Issue, Children extends ZenFormFieldTree> {
-  readonly key: ZenFormKey;
+export interface IFieldState<Value, Issue, Children extends FormiFieldTree> {
+  readonly key: FormiKey;
   readonly path: Path;
   readonly name: string; // path as string
   // All field keys (self + children recursively)
   // This is used to know which fields to update when a field changes
-  readonly keys: ReadonlySet<ZenFormKey>;
+  readonly keys: ReadonlySet<FormiKey>;
 
   readonly initialRawValue: InputBase<Children> | undefined;
   readonly rawValue: InputBase<Children> | undefined;
@@ -34,18 +34,18 @@ export interface IFieldState<Value, Issue, Children extends ZenFormFieldTree> {
   readonly isSubmitted: boolean;
 }
 
-export type FieldStateOf<Field extends ZenFormFieldAny> = IFieldState<
-  ZenFormFieldValue<Field>,
-  ZenFormFieldIssue<Field>,
-  ZenFormFieldChildren<Field>
+export type FieldStateOf<Field extends FormiFieldAny> = IFieldState<
+  FormiFieldValue<Field>,
+  FormiFieldIssue<Field>,
+  FormiFieldChildren<Field>
 >;
 
 export type FieldStateAny = IFieldState<any, any, any>;
 
-export type FieldsStateMap = ImmuWeakMap<ZenFormKey, FieldStateAny>;
-export type FieldsStateMapDraft = ImmuWeakMapDraft<ZenFormKey, FieldStateAny>;
+export type FieldsStateMap = ImmuWeakMap<FormiKey, FieldStateAny>;
+export type FieldsStateMapDraft = ImmuWeakMapDraft<FormiKey, FieldStateAny>;
 
-export type ZenFormStoreActions =
+export type FormiStoreActions =
   | { type: 'Mount'; data: FormData }
   | {
       type: 'Change';
@@ -54,43 +54,43 @@ export type ZenFormStoreActions =
       touched: boolean;
       // All fields that need to be updated
       // null means all fields
-      fields: ReadonlyArray<ZenFormFieldAny> | null;
+      fields: ReadonlyArray<FormiFieldAny> | null;
     }
   | { type: 'Submit'; data: FormData }
   | { type: 'Reset'; data: FormData }
   | {
       // This action is triggered when controller.setIssues is called
       type: 'SetIssues';
-      issues: ZenFormIssues<any>;
+      issues: FormiIssues<any>;
     }
   | {
       // This action updated the shape of the form
       type: 'SetFields';
-      fields: ZenFormFieldTree | FieldsUpdateFn<ZenFormFieldTree>;
+      fields: FormiFieldTree | FieldsUpdateFn<FormiFieldTree>;
     };
 
-export type RootZenFormField = IZenFormField<any, any, ZenFormFieldTree>;
+export type RootFormiField = IFormiField<any, any, FormiFieldTree>;
 
-export interface ZenFormState {
+export interface FormiState {
   // If the root fields is an object of fields we wrap it in a group
   readonly rootFieldWrapped: boolean;
   // The tree of fields
-  readonly rootField: RootZenFormField;
+  readonly rootField: RootFormiField;
   // State for each field
   readonly states: FieldsStateMap;
 }
 
-export type DebugStateResult = Array<{ field: ZenFormFieldAny; state: FieldStateAny }>;
+export type DebugStateResult = Array<{ field: FormiFieldAny; state: FieldStateAny }>;
 
-export interface IZenFormStore {
-  readonly subscribe: SubscribeMethod<ZenFormState>;
-  readonly getState: () => ZenFormState;
-  readonly dispatch: (action: ZenFormStoreActions) => ZenFormState;
+export interface IFormiStore {
+  readonly subscribe: SubscribeMethod<FormiState>;
+  readonly getState: () => FormiState;
+  readonly dispatch: (action: FormiStoreActions) => FormiState;
   // utils
   readonly hasErrors: () => boolean;
   readonly getValueOrThrow: () => any;
-  readonly getIssuesOrThrow: () => ZenFormIssues<any>;
+  readonly getIssuesOrThrow: () => FormiIssues<any>;
 
-  readonly debugState: (state: ZenFormState) => DebugStateResult;
-  readonly logDegugState: (state: ZenFormState) => void;
+  readonly debugState: (state: FormiState) => DebugStateResult;
+  readonly logDegugState: (state: FormiState) => void;
 }

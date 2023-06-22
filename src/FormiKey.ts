@@ -2,19 +2,19 @@ import { nanoid } from './utils';
 
 const FORMI_KEY = Symbol('FORMI_KEY');
 
-export interface ZenFormKey {
+export interface FormiKey {
   readonly [FORMI_KEY]: true;
   readonly toString: () => string;
   readonly id: string;
 }
 
-export const ZenFormKey = (() => {
+export const FormiKey = (() => {
   return create;
 
-  function create(): ZenFormKey {
+  function create(): FormiKey {
     const id = nanoid(14);
-    const print = `ZenFormKey(${id})`;
-    const key: ZenFormKey = {
+    const print = `FormiKey(${id})`;
+    const key: FormiKey = {
       [FORMI_KEY]: true,
       toString: () => print,
       id,

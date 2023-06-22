@@ -1,5 +1,3 @@
-// import { ErreursMap } from 'erreur';
-
 import { ErreurType } from 'erreur';
 
 export type Key = string | number;

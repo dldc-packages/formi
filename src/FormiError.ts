@@ -1,7 +1,7 @@
 import { ErreurType } from 'erreur';
-import { ZenFormFieldAny } from './ZenFormField.types';
-import { ZenFormFieldTree } from './ZenFormFieldTree';
-import { ZenFormKey } from './ZenFormKey';
+import { FormiFieldAny } from './FormiField.types';
+import { FormiFieldTree } from './FormiFieldTree';
+import { FormiKey } from './FormiKey';
 import type { Path } from './tools/Path';
 
 export interface IInternal_UnhandledAction {
@@ -9,7 +9,7 @@ export interface IInternal_UnhandledAction {
 }
 
 export interface IInternal_DuplicateKey {
-  readonly key: ZenFormKey;
+  readonly key: FormiKey;
   readonly current: Path;
   readonly conflict: Path;
 }
@@ -18,7 +18,7 @@ export interface IInternal_UnexpectedNever {
   readonly received: any;
 }
 
-export const ZenFormInternalErrors = {
+export const FormiInternalErrors = {
   Internal_UnhandledAction: ErreurType.defineWithTransform(
     'Internal_UnhandledAction',
     (action: any): IInternal_UnhandledAction => ({ action }),
@@ -28,7 +28,7 @@ export const ZenFormInternalErrors = {
   ),
   Internal_DuplicateKey: ErreurType.defineWithTransform(
     'Internal_DuplicateKey',
-    (key: ZenFormKey, current: Path, conflict: Path): IInternal_DuplicateKey => ({ key, current, conflict }),
+    (key: FormiKey, current: Path, conflict: Path): IInternal_DuplicateKey => ({ key, current, conflict }),
     (err, provider, data) => {
       return err
         .with(provider)
@@ -49,18 +49,18 @@ export interface IMissingFormRef {
 }
 
 export interface IReusedField {
-  tree: ZenFormFieldTree;
-  field: ZenFormFieldAny;
+  tree: FormiFieldTree;
+  field: FormiFieldAny;
   paths: Array<Path>;
 }
 
 export interface IFieldNotFound {
-  tree: ZenFormFieldTree;
-  field: ZenFormFieldAny;
+  tree: FormiFieldTree;
+  field: FormiFieldAny;
 }
 
 export interface IValidateSuccessWithoutValue {
-  field: ZenFormFieldAny;
+  field: FormiFieldAny;
   input: any;
 }
 
@@ -73,11 +73,11 @@ export interface IGetValueUnresolved {
 }
 
 export interface IMissingFieldState {
-  field: ZenFormFieldAny;
+  field: FormiFieldAny;
 }
 
-export const ZenFormErrors = {
-  ...ZenFormInternalErrors,
+export const FormiErrors = {
+  ...FormiInternalErrors,
   MissingFormRef: ErreurType.defineWithTransform(
     'MissingFormRef',
     (formName: string): IMissingFormRef => ({ formName }),
@@ -87,7 +87,7 @@ export const ZenFormErrors = {
   ),
   ReusedField: ErreurType.defineWithTransform(
     'ReusedField',
-    (tree: ZenFormFieldTree, field: ZenFormFieldAny, paths: Array<Path>): IReusedField => ({ tree, field, paths }),
+    (tree: FormiFieldTree, field: FormiFieldAny, paths: Array<Path>): IReusedField => ({ tree, field, paths }),
     (err, provider, data) => {
       return err
         .with(provider)
@@ -100,14 +100,14 @@ export const ZenFormErrors = {
   ),
   FieldNotFound: ErreurType.defineWithTransform(
     'FieldNotFound',
-    (tree: ZenFormFieldTree, field: ZenFormFieldAny): IFieldNotFound => ({ tree, field }),
+    (tree: FormiFieldTree, field: FormiFieldAny): IFieldNotFound => ({ tree, field }),
     (err, provider, data) => {
       return err.with(provider).withMessage(`Field "${data.field.key.toString()}" not found in tree.`);
     }
   ),
   ValidateSuccessWithoutValue: ErreurType.defineWithTransform(
     'ValidateSuccessWithoutValue',
-    (field: ZenFormFieldAny, input: any): IValidateSuccessWithoutValue => ({ field, input }),
+    (field: FormiFieldAny, input: any): IValidateSuccessWithoutValue => ({ field, input }),
     (err, provider) => {
       return err
         .with(provider)
@@ -130,15 +130,15 @@ export const ZenFormErrors = {
   ),
   MissingFieldState: ErreurType.defineWithTransform(
     'MissingFieldState',
-    (field: ZenFormFieldAny): IMissingFieldState => ({ field }),
+    (field: FormiFieldAny): IMissingFieldState => ({ field }),
     (err, provider, data) => {
       return err.with(provider).withMessage(`Missing field state for field "${data.field.key}"`);
     }
   ),
-  MissingZenFormContext: ErreurType.defineEmpty('MissingZenFormContext', (err, provider) =>
-    err.with(provider).withMessage(`No ZenFormContext found`)
+  MissingFormiContext: ErreurType.defineEmpty('MissingFormiContext', (err, provider) =>
+    err.with(provider).withMessage(`No FormiContext found`)
   ),
-  MissingZenFormController: ErreurType.defineEmpty('MissingZenFormController', (err, provider) =>
-    err.with(provider).withMessage(`No ZenFormController found`)
+  MissingFormiController: ErreurType.defineEmpty('MissingFormiController', (err, provider) =>
+    err.with(provider).withMessage(`No FormiController found`)
   ),
 };

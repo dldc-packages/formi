@@ -1,27 +1,27 @@
 import {
-  IZenFormController,
+  IFormiController,
   OnSubmit,
   OnSubmitActions,
-  ZenFormControllerOptions,
-  ZenFormResult,
-} from './ZenFormController.types';
-import { ZenFormErrors } from './ZenFormError';
-import { ZenFormFieldAny } from './ZenFormField.types';
-import { ZenFormFieldTree } from './ZenFormFieldTree';
-import { ZenFormIssues } from './ZenFormIssue';
-import { ZenFormIssuesBuilder } from './ZenFormIssuesBuilder';
-import { ZenFormStore } from './ZenFormStore';
+  FormiControllerOptions,
+  FormiResult,
+} from './FormiController.types';
+import { FormiErrors } from './FormiError';
+import { FormiFieldAny } from './FormiField.types';
+import { FormiFieldTree } from './FormiFieldTree';
+import { FormiIssues } from './FormiIssue';
+import { FormiIssuesBuilder } from './FormiIssuesBuilder';
+import { FormiStore } from './FormiStore';
 import { Path } from './tools/Path';
 
 export const IS_FORM_CONTROLLER = Symbol('IS_FORM_CONTROLLER');
 
-export const ZenFormController = (() => {
+export const FormiController = (() => {
   return Object.assign(create, { validate });
 
-  function validate<Tree extends ZenFormFieldTree>(
-    options: ZenFormControllerOptions<Tree>,
+  function validate<Tree extends FormiFieldTree>(
+    options: FormiControllerOptions<Tree>,
     data: FormData
-  ): ZenFormResult<Tree> {
+  ): FormiResult<Tree> {
     const formPaths: Path[] = [];
     Array.from(data.keys())
       .map((p) => Path.from(p))
@@ -32,28 +32,28 @@ export const ZenFormController = (() => {
         }
         formPaths.push(fieldPath);
       });
-    const fields = ZenFormFieldTree.restoreFromPaths(options.initialFields, formPaths);
+    const fields = FormiFieldTree.restoreFromPaths(options.initialFields, formPaths);
     const controller = create<Tree>({ ...options, initialFields: fields });
     controller.submit(data);
     return controller.getResult();
   }
 
-  function create<Tree extends ZenFormFieldTree>({
+  function create<Tree extends FormiFieldTree>({
     formName,
     validateOnMount = true,
     initialFields,
     initialIssues,
     onSubmit: userOnSubmit,
     onReset: userOnReset,
-  }: ZenFormControllerOptions<Tree>): IZenFormController<Tree> {
+  }: FormiControllerOptions<Tree>): IFormiController<Tree> {
     Path.validatePathItem(formName);
 
     let onSubmit: OnSubmit<Tree> | null = userOnSubmit ?? null;
     let formEl: HTMLFormElement | null = null;
 
-    const store = ZenFormStore(formName, initialFields, initialIssues);
+    const store = FormiStore(formName, initialFields, initialIssues);
 
-    const self: IZenFormController<Tree> = {
+    const self: IFormiController<Tree> = {
       [IS_FORM_CONTROLLER]: true,
       formName,
 
@@ -77,7 +77,7 @@ export const ZenFormController = (() => {
       onSubmit = newOnSubmit;
     }
 
-    function setIssues(issues: ZenFormIssues<any>) {
+    function setIssues(issues: FormiIssues<any>) {
       store.dispatch({ type: 'SetIssues', issues });
     }
 
@@ -85,17 +85,17 @@ export const ZenFormController = (() => {
       store.dispatch({ type: 'SetFields', fields: fields as any });
     }
 
-    function revalidate(...fields: ZenFormFieldAny[]) {
+    function revalidate(...fields: FormiFieldAny[]) {
       const form = getForm();
       const data = new FormData(form);
       store.dispatch({ type: 'Change', data, touched: false, fields: fields.length === 0 ? null : fields });
       return;
     }
 
-    function getResult(): ZenFormResult<Tree> {
+    function getResult(): FormiResult<Tree> {
       const { rootField } = store.getState();
       const fields = rootField.children as Tree;
-      const customIssues = ZenFormIssuesBuilder(fields) as ZenFormIssuesBuilder<unknown>;
+      const customIssues = FormiIssuesBuilder(fields) as FormiIssuesBuilder<unknown>;
       if (store.hasErrors() === false) {
         const value = store.getValueOrThrow();
         return { fields, customIssues, success: true, value };
@@ -106,7 +106,7 @@ export const ZenFormController = (() => {
 
     function getForm() {
       if (!formEl) {
-        throw ZenFormErrors.MissingFormRef.create(formName);
+        throw FormiErrors.MissingFormRef.create(formName);
       }
       return formEl;
     }
@@ -158,7 +158,7 @@ export const ZenFormController = (() => {
       const form = getForm();
       const data = new FormData(form);
       const fields = store.getState().rootField;
-      const field = ZenFormFieldTree.findByPath(fields, path);
+      const field = FormiFieldTree.findByPath(fields, path);
       if (!field) {
         console.warn(`Field not found: ${name}`);
         return;
