@@ -29,6 +29,7 @@ export const FormiStore = (() => {
     return {
       subscribe: subscription.subscribe,
       getState,
+      getTree,
       dispatch,
       getIssuesOrThrow,
       getValueOrThrow,
@@ -55,6 +56,10 @@ export const FormiStore = (() => {
 
     function getState(): FormiState {
       return state;
+    }
+
+    function getTree(): FormiFieldTree {
+      return FormiFieldTree.unwrap(state.rootField, state.rootFieldWrapped);
     }
 
     function reducer(state: FormiState, action: FormiStoreActions): FormiState {

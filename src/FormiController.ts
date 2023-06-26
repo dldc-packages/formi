@@ -93,8 +93,9 @@ export const FormiController = (() => {
     }
 
     function getResult(): FormiResult<Tree> {
-      const { rootField } = store.getState();
-      const fields = rootField as Tree;
+      // const { rootField } = store.getState();
+      const fields = store.getTree() as Tree;
+      // QUESTION: is it OK to use the unwrapped fields here?
       const customIssues = FormiIssuesBuilder(fields) as FormiIssuesBuilder<unknown>;
       if (store.hasErrors() === false) {
         const value = store.getValueOrThrow();

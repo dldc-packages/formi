@@ -85,6 +85,7 @@ export type DebugStateResult = Array<{ field: FormiFieldAny; state: FieldStateAn
 export interface IFormiStore {
   readonly subscribe: SubscribeMethod<FormiState>;
   readonly getState: () => FormiState;
+  readonly getTree: () => FormiFieldTree;
   readonly dispatch: (action: FormiStoreActions) => FormiState;
   // utils
   readonly hasErrors: () => boolean;
