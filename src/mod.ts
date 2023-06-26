@@ -1,5 +1,6 @@
 export * from './FormiController';
 export * from './FormiController.types';
+export * from './FormiError';
 export * from './FormiField';
 export * from './FormiField.types';
 export * from './FormiFieldTree';
