@@ -1,9 +1,9 @@
 import {
+  FormiControllerOptions,
+  FormiResult,
   IFormiController,
   OnSubmit,
   OnSubmitActions,
-  FormiControllerOptions,
-  FormiResult,
 } from './FormiController.types';
 import { FormiErrors } from './FormiError';
 import { FormiFieldAny } from './FormiField.types';
@@ -94,7 +94,7 @@ export const FormiController = (() => {
 
     function getResult(): FormiResult<Tree> {
       const { rootField } = store.getState();
-      const fields = rootField.children as Tree;
+      const fields = rootField as Tree;
       const customIssues = FormiIssuesBuilder(fields) as FormiIssuesBuilder<unknown>;
       if (store.hasErrors() === false) {
         const value = store.getValueOrThrow();

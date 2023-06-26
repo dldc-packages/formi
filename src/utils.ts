@@ -1,5 +1,7 @@
 import { FormiInternalErrors } from './FormiError';
 
+export const FileOrBlob = globalThis.File || globalThis.Blob;
+
 export const nanoid = (() => {
   // https://github.com/ai/nanoid/blob/main/non-secure/index.js
   const urlAlphabet = 'useandom-26T198340PX75pxJACKVERYMINDBUSHWOLF_GQZbfghjklqvwyzrict';
@@ -26,8 +28,8 @@ export function expectNever(val: never, inner?: (val: any) => void): never {
 }
 
 export function shallowEqual(left: any, right: any): boolean {
-  if (left instanceof File || right instanceof File) {
-    // never compare files)
+  if (left instanceof FileOrBlob || right instanceof FileOrBlob) {
+    // never compare files
     return false;
   }
   if (left === right) {

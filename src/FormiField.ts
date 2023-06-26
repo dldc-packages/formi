@@ -2,6 +2,7 @@ import { z } from 'zod';
 import {
   ChildrenUpdateFn,
   CreateFieldOptions,
+  FormiFieldAny,
   IFormiField,
   InputBase,
   RestoreFromPaths,
@@ -9,7 +10,6 @@ import {
   ValidateFn,
   ValidateResult,
   ValidateSuccess,
-  FormiFieldAny,
 } from './FormiField.types';
 import { FormiFieldTree, FormiFieldTreeValue } from './FormiFieldTree';
 import {
@@ -23,6 +23,7 @@ import {
 } from './FormiIssue';
 import { FormiKey } from './FormiKey';
 import { Path } from './tools/Path';
+import { FileOrBlob } from './utils';
 
 export const FIELD_TYPES = Symbol('FIELD_TYPES');
 export const FIELD_VALIDATE_FN = Symbol('FIELD_VALIDATE_FN');
@@ -270,7 +271,7 @@ export const FormiField = (() => {
   }
 
   function isNotFile<Value>(input: Value | File): ValidateResult<Value, FormiIssueNotFile> {
-    if (input instanceof File) {
+    if (input instanceof FileOrBlob) {
       return failure<FormiIssueNotFile>({ kind: 'UnexpectedFile' });
     }
     return success<Value>(input);
