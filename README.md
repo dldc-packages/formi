@@ -1,3 +1,3 @@
 # 📄 Formi
 
-> A type-safe form tp manipulate FormData
+> A type-safe tool to manipulate FormData
