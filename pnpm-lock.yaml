@@ -22,6 +22,9 @@ dependencies:
     version: 3.21.4
 
 devDependencies:
+  '@types/node':
+    specifier: ^20.3.1
+    version: 20.3.1
   '@typescript-eslint/eslint-plugin':
     specifier: ^5.59.11
     version: 5.59.11(@typescript-eslint/parser@5.59.11)(eslint@8.42.0)(typescript@5.1.3)
