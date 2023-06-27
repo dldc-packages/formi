@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { ImmuWeakMap } from '../src/mod';
+import { ImmuWeakMap } from '../../src/mod';
 
 test('Create ImmuWeakMap', () => {
   const map = ImmuWeakMap(new WeakMap());

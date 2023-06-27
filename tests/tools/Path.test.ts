@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { Path, RawPath } from '../src/mod';
+import { Path, RawPath } from '../../src/mod';
 
 describe('serialize / parse', () => {
   const testCases: Array<[RawPath, string]> = [

@@ -45,6 +45,7 @@ export interface IFormiController<Tree extends FormiFieldTree> {
   readonly setIssues: (issues: FormiIssues<any>) => void;
   readonly setOnSubmit: (onSubmit: OnSubmit<Tree>) => void;
   readonly setFields: (update: Tree | ((prev: Tree) => Tree)) => void;
+  readonly getFields: () => Tree;
   /**
    * Revalidate the given fields.
    * If no fields are given, all fields will be revalidated.

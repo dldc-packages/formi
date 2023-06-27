@@ -1,12 +1,12 @@
 import { SubscribeMethod } from 'suub';
 import { FieldsUpdateFn } from './FormiController.types';
 import {
-  IFormiField,
-  InputBase,
   FormiFieldAny,
   FormiFieldChildren,
   FormiFieldIssue,
   FormiFieldValue,
+  IFormiField,
+  InputBase,
 } from './FormiField.types';
 import { FormiFieldTree } from './FormiFieldTree';
 import { FormiIssues } from './FormiIssue';

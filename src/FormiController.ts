@@ -65,6 +65,7 @@ export const FormiController = (() => {
       setIssues,
       setOnSubmit,
       setFields,
+      getFields,
       revalidate,
 
       mount,
@@ -110,6 +111,10 @@ export const FormiController = (() => {
         throw FormiErrors.MissingFormRef.create(formName);
       }
       return formEl;
+    }
+
+    function getFields() {
+      return store.getTree() as Tree;
     }
 
     function submit(data: FormData, actions?: OnSubmitActions) {
