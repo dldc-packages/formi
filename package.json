@@ -7,13 +7,13 @@
     "formdata",
     "type-safe"
   ],
-  "homepage": "https://github.com/etienne-dldc/formi#readme",
+  "homepage": "https://github.com/dldc-packages/formi#readme",
   "bugs": {
-    "url": "https://github.com/etienne-dldc/formi/issues"
+    "url": "https://github.com/dldc-packages/formi/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/etienne-dldc/formi.git"
+    "url": "git+https://github.com/dldc-packages/formi.git"
   },
   "license": "MIT",
   "author": "Etienne Dldc <e.deladonchamps@gmail.com>",
