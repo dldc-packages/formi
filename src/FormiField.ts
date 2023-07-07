@@ -94,7 +94,7 @@ export const FormiField = (() => {
     }
 
     function validate<NextValue = Value, NextIssue = never>(
-      validateFn: ValidateFn<Value, NextValue, Issue | NextIssue>
+      validateFn: ValidateFn<Value, NextValue, Issue | NextIssue>,
     ): IFormiField<NextValue, Issue | NextIssue, Children> {
       const nextValidate = (input: any) => {
         const prev = currentValidateFn(input);
@@ -122,7 +122,7 @@ export const FormiField = (() => {
     }
 
     function zodValidate<NextValue = Value>(
-      schema: z.Schema<NextValue>
+      schema: z.Schema<NextValue>,
     ): IFormiField<NextValue, Issue | FormiIssueZod, Children> {
       return validate(zodValidator(schema));
     }
@@ -176,7 +176,7 @@ export const FormiField = (() => {
   }
 
   function group<Children extends FormiFieldTree>(
-    children: Children
+    children: Children,
   ): IFormiField<FormiFieldTreeValue<Children>, FormiIssueBase, Children> {
     return create<FormiFieldTreeValue<Children>, FormiIssueBase, Children>({
       key: FormiKey(),
@@ -188,7 +188,7 @@ export const FormiField = (() => {
 
   function repeat<Child extends FormiFieldTree>(
     child: Child,
-    initialCount: number = 1
+    initialCount: number = 1,
   ): IFormiField<Array<FormiFieldTreeValue<Child>>, FormiIssueBase, Array<Child>> {
     const initialChildren = Array.from({ length: initialCount }, () => FormiFieldTree.clone(child));
     return create<Array<FormiFieldTreeValue<Child>>, FormiIssueBase, Array<Child>>({

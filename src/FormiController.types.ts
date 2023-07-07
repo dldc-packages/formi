@@ -14,7 +14,7 @@ export type OnSubmitActions = {
 
 export type OnSubmit<Tree extends FormiFieldTree> = (
   data: { value: FormiFieldTreeValue<Tree>; formData: FormData },
-  actions: OnSubmitActions
+  actions: OnSubmitActions,
 ) => void;
 
 export type FormiResult<Tree extends FormiFieldTree> =

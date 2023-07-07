@@ -223,7 +223,7 @@ export const FormiStore = (() => {
 
     function updateStates(
       state: FormiState,
-      updater: (draft: FieldsStateMapDraft, fields: RootFormiField) => void
+      updater: (draft: FieldsStateMapDraft, fields: RootFormiField) => void,
     ): FormiState {
       const draft = state.states.draft();
       updater(draft, state.rootField);
@@ -238,7 +238,7 @@ export const FormiStore = (() => {
     function createInitialState(
       formName: string,
       fields: FormiFieldTree,
-      issues: FormiIssues<any> | undefined
+      issues: FormiIssues<any> | undefined,
     ): FormiState {
       const map = ImmuWeakMap.empty<FormiKey, FieldStateAny>();
       const draft = map.draft();
@@ -269,7 +269,7 @@ export const FormiStore = (() => {
       field: FormiFieldAny,
       path: Path,
       keys: Set<FormiKey>,
-      issues: FormiIssues<any> | undefined
+      issues: FormiIssues<any> | undefined,
     ): FieldStateAny {
       const issuesResolved = getFieldIssues(path, issues);
       return {
@@ -294,7 +294,7 @@ export const FormiStore = (() => {
       formName: string,
       tree: FormiFieldTree,
       draft: FieldsStateMapDraft,
-      issues: FormiIssues<any> | undefined
+      issues: FormiIssues<any> | undefined,
     ): void {
       traverseWithKeys(formName, tree, (field, path, keys) => {
         const state = createFieldState(field, path, keys, issues);
@@ -310,7 +310,7 @@ export const FormiStore = (() => {
     function traverseWithKeys(
       formName: string,
       tree: FormiFieldTree,
-      visitor: (field: FormiFieldAny, path: Path, keys: Set<FormiKey>) => void
+      visitor: (field: FormiFieldAny, path: Path, keys: Set<FormiKey>) => void,
     ) {
       FormiFieldTree.traverse<{ path: Path; keys: Set<FormiKey> }>(tree, (field, path, next) => {
         const sub = next();

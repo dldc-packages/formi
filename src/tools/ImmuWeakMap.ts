@@ -10,14 +10,14 @@ export const ImmuWeakMapErrors = {
     (key: any): IMissingKeyError => ({ key }),
     (err, provider, data) => {
       return err.with(provider).withMessage(`Unexpected missing key "${data.key}"`);
-    }
+    },
   ),
   CannotUpdateUnregisteredKey: ErreurType.defineWithTransform(
     'CannotUpdateUnregisteredKey',
     (key: any): IMissingKeyError => ({ key }),
     (err, provider, data) => {
       return err.with(provider).withMessage(`Cannot update unregistered key "${data.key}"`);
-    }
+    },
   ),
 };
 

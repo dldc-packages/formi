@@ -20,7 +20,7 @@ export const FormiController = (() => {
 
   function validate<Tree extends FormiFieldTree>(
     options: FormiControllerOptions<Tree>,
-    data: FormData
+    data: FormData,
   ): FormiResult<Tree> {
     const formPaths: Path[] = [];
     Array.from(data.keys())

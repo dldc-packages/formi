@@ -25,7 +25,7 @@ export const PathErrors = {
     (item: string): IInvalidStringPathItem => ({ item }),
     (err, provider, data) => {
       return err.with(provider).withMessage(`String Path item cannot contain . or [ or ] (received "${data.item}")`);
-    }
+    },
   ),
   InvalidNumberPathItem: ErreurType.defineWithTransform(
     'InvalidNumberPathItem',
@@ -34,7 +34,7 @@ export const PathErrors = {
       return err
         .with(provider)
         .withMessage(`Number Path item must be a positive (or 0) integer (received "${data.item}")`);
-    }
+    },
   ),
 };
 
@@ -176,7 +176,7 @@ export const Path = (() => {
           return parseInt(part.slice(1, -1), 10);
         }
         return part;
-      })
+      }),
     );
   }
 

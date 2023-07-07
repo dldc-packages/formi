@@ -52,7 +52,7 @@ export const FormiFieldTree = (() => {
 
   function traverse<T>(
     tree: FormiFieldTree,
-    visitor: (field: FormiFieldAny, path: Path, next: () => Array<T>) => T
+    visitor: (field: FormiFieldAny, path: Path, next: () => Array<T>) => T,
   ): Array<T> {
     function next(current: FormiFieldTree, base: Path): Array<T> {
       return getChildren(current, base).map(({ item, path }) => {
@@ -190,7 +190,7 @@ export const FormiFieldTree = (() => {
       Object.entries(tree).map(([key, value]): [string, FormiFieldTree] => {
         const paths = pathsByKey.get(key) ?? [];
         return [key, restoreFromPaths(value, paths)];
-      })
+      }),
     ) as Tree;
   }
 })();

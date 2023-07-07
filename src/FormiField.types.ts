@@ -27,7 +27,7 @@ export type FormiFieldChildren<F extends FormiFieldAny> = F['children'];
 export type RestoreFromPaths<Children extends FormiFieldTree> = (paths: ReadonlyArray<Path>) => Children;
 
 export type Validate<Value, Issue, Children extends FormiFieldTree = null> = <NextValue = Value, NextIssue = never>(
-  validateFn: ValidateFn<Value, NextValue, Issue | NextIssue>
+  validateFn: ValidateFn<Value, NextValue, Issue | NextIssue>,
 ) => IFormiField<NextValue, Issue | NextIssue, Children>;
 
 export interface IFormiField<Value, Issue, Children extends FormiFieldTree = null> {
@@ -40,7 +40,7 @@ export interface IFormiField<Value, Issue, Children extends FormiFieldTree = nul
   readonly clone: () => IFormiField<Value, Issue, Children>;
   readonly validate: Validate<Value, Issue, Children>;
   readonly zodValidate: <NextValue = Value>(
-    schema: z.Schema<NextValue>
+    schema: z.Schema<NextValue>,
   ) => IFormiField<NextValue, Issue | FormiIssueZod, Children>;
   readonly withIssue: <NextIssue>() => IFormiField<Value, Issue | NextIssue, Children>;
   readonly withChildren: (children: Children | ChildrenUpdateFn<Children>) => IFormiField<Value, Issue, Children>;
