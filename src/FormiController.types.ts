@@ -1,4 +1,4 @@
-import { SubscribeMethod } from 'suub';
+import { SubscribeMethod } from '@dldc/pubsub';
 import { IS_FORM_CONTROLLER } from './FormiController';
 import { FormiFieldAny } from './FormiField.types';
 import { FormiFieldTree, FormiFieldTreeValue } from './FormiFieldTree';

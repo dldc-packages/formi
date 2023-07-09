@@ -1,4 +1,4 @@
-import { ErreurType } from 'erreur';
+import { ErreurType } from '@dldc/erreur';
 import { FormiFieldAny } from './FormiField.types';
 import { FormiFieldTree } from './FormiFieldTree';
 import { FormiKey } from './FormiKey';

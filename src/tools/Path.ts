@@ -1,4 +1,4 @@
-import { ErreurType } from 'erreur';
+import { ErreurType } from '@dldc/erreur';
 
 export type Key = string | number;
 export type RawPath = ReadonlyArray<Key>;

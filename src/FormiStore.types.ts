@@ -1,4 +1,4 @@
-import { SubscribeMethod } from 'suub';
+import { SubscribeMethod } from '@dldc/pubsub';
 import { FieldsUpdateFn } from './FormiController.types';
 import {
   FormiFieldAny,

@@ -1,7 +1,7 @@
-import { Subscription } from 'suub';
+import { Suub } from '@dldc/pubsub';
 import { FormiErrors, FormiInternalErrors } from './FormiError';
 import { FormiField } from './FormiField';
-import { InputBase, FormiFieldAny } from './FormiField.types';
+import { FormiFieldAny, InputBase } from './FormiField.types';
 import { FormiFieldTree } from './FormiFieldTree';
 import { FormiIssue, FormiIssueBase, FormiIssues } from './FormiIssue';
 import { FormiKey } from './FormiKey';
@@ -10,10 +10,10 @@ import {
   FieldStateAny,
   FieldsStateMap,
   FieldsStateMapDraft,
-  IFormiStore,
-  RootFormiField,
   FormiState,
   FormiStoreActions,
+  IFormiStore,
+  RootFormiField,
 } from './FormiStore.types';
 import { ImmuWeakMap } from './tools/ImmuWeakMap';
 import { Path } from './tools/Path';
@@ -24,7 +24,7 @@ export const FormiStore = (() => {
 
   function create(formName: string, initialFields: FormiFieldTree, issues: FormiIssues<any> | undefined): IFormiStore {
     let state: FormiState = createInitialState(formName, initialFields, issues);
-    const subscription = Subscription<FormiState>();
+    const subscription = Suub.createSubscription<FormiState>();
 
     return {
       subscribe: subscription.subscribe,

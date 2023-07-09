@@ -1,4 +1,4 @@
-import { ErreurType } from 'erreur';
+import { ErreurType } from '@dldc/erreur';
 
 export interface IMissingKeyError {
   key: any;
