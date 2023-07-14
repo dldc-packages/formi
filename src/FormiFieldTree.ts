@@ -1,17 +1,9 @@
 import { FormiErrors } from './FormiError';
 import { FormiField } from './FormiField';
-import { IFormiField, FormiFieldAny } from './FormiField.types';
+import { FormiFieldAny, IFormiField } from './FormiField.types';
 import { Path } from './tools/Path';
 
 export type FormiFieldTree = null | FormiFieldAny | FormiFieldTree[] | { [key: string]: FormiFieldTree };
-
-// export type FormiFieldTreeIssue<Tree extends FormiFieldTree> = Tree extends FormiFieldAny
-//   ? FormiFieldIssue<Tree> | FormiFieldTreeIssue<Tree['children']>
-//   : Tree extends Array<infer Inner extends FormiFieldTree>
-//   ? FormiFieldTreeIssue<Inner>
-//   : Tree extends Record<string, FormiFieldAny>
-//   ? { [K in keyof Tree]: FormiFieldTreeIssue<Tree[K]> }[keyof Tree]
-//   : never;
 
 export type FormiFieldTreeValue<Tree extends FormiFieldTree> = Tree extends IFormiField<infer V, any, any>
   ? V
@@ -140,7 +132,14 @@ export const FormiFieldTree = (() => {
     return Object.fromEntries(Object.entries(tree).map(([key, value]) => [key, clone(value)])) as Tree;
   }
 
+  /**
+   * Given the initial tree and a list of paths, restore the tree
+   * (mainly array items to restore the correct number of items)
+   */
   function restoreFromPaths<Tree extends FormiFieldTree>(tree: Tree, paths: ReadonlyArray<Path>): Tree {
+    if (paths.length === 0) {
+      return tree;
+    }
     if (tree === null) {
       return tree;
     }
