@@ -1,7 +1,7 @@
 import { ErreurType } from '@dldc/erreur';
-import { FormiFieldAny } from './FormiField.types';
-import { FormiFieldTree } from './FormiFieldTree';
-import { FormiKey } from './FormiKey';
+import type { FormiFieldAny } from './FormiField.types';
+import type { FormiFieldTree } from './FormiFieldTree';
+import type { FormiKey } from './FormiKey';
 import type { Path } from './tools/Path';
 
 export interface IInternal_UnhandledAction {
@@ -32,7 +32,9 @@ export const FormiInternalErrors = {
     (err, provider, data) => {
       return err
         .with(provider)
-        .withMessage(`Duplicate key "${data.key}" (${data.current.serialize()} and ${data.conflict.serialize()})`);
+        .withMessage(
+          `Duplicate key "${data.key.toString()}" (${data.current.serialize()} and ${data.conflict.serialize()})`,
+        );
     },
   ),
   Internal_UnexpectedNever: ErreurType.defineWithTransform(
@@ -132,7 +134,7 @@ export const FormiErrors = {
     'MissingFieldState',
     (field: FormiFieldAny): IMissingFieldState => ({ field }),
     (err, provider, data) => {
-      return err.with(provider).withMessage(`Missing field state for field "${data.field.key}"`);
+      return err.with(provider).withMessage(`Missing field state for field "${data.field.key.toString()}"`);
     },
   ),
   MissingFormiContext: ErreurType.defineEmpty('MissingFormiContext', (err, provider) =>

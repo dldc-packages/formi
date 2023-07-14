@@ -1,5 +1,5 @@
-import { z } from 'zod';
-import {
+import type { z } from 'zod';
+import type {
   ChildrenUpdateFn,
   CreateFieldOptions,
   FormiFieldAny,
@@ -11,8 +11,9 @@ import {
   ValidateResult,
   ValidateSuccess,
 } from './FormiField.types';
-import { FormiFieldTree, FormiFieldTreeValue } from './FormiFieldTree';
-import {
+import type { FormiFieldTreeValue } from './FormiFieldTree';
+import { FormiFieldTree } from './FormiFieldTree';
+import type {
   FormiIssueBase,
   FormiIssueNonEmptyFile,
   FormiIssueNotFile,
@@ -22,7 +23,7 @@ import {
   FormiIssueZod,
 } from './FormiIssue';
 import { FormiKey } from './FormiKey';
-import { Path } from './tools/Path';
+import type { Path } from './tools/Path';
 import { FileOrBlob } from './utils';
 
 export const FIELD_TYPES = Symbol('FIELD_TYPES');

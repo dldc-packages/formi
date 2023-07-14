@@ -1,5 +1,5 @@
 import type { ZodIssue } from 'zod';
-import { RawPath } from './tools/Path';
+import type { RawPath } from './tools/Path';
 
 export type FormiIssuesItem<Issue> = { path: RawPath; issues: Array<Issue> };
 export type FormiIssues<Issue> = Array<FormiIssuesItem<Issue>>;

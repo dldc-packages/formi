@@ -1,4 +1,4 @@
-import {
+import type {
   FormiControllerOptions,
   FormiResult,
   IFormiController,
@@ -6,9 +6,9 @@ import {
   OnSubmitActions,
 } from './FormiController.types';
 import { FormiErrors } from './FormiError';
-import { FormiFieldAny } from './FormiField.types';
+import type { FormiFieldAny } from './FormiField.types';
 import { FormiFieldTree } from './FormiFieldTree';
-import { FormiIssues } from './FormiIssue';
+import type { FormiIssues } from './FormiIssue';
 import { FormiIssuesBuilder } from './FormiIssuesBuilder';
 import { FormiStore } from './FormiStore';
 import { Path } from './tools/Path';
@@ -97,7 +97,7 @@ export const FormiController = (() => {
       // const { rootField } = store.getState();
       const fields = store.getTree() as Tree;
       // QUESTION: is it OK to use the unwrapped fields here?
-      const customIssues = FormiIssuesBuilder(fields) as FormiIssuesBuilder<unknown>;
+      const customIssues = FormiIssuesBuilder(fields);
       if (store.hasErrors() === false) {
         const value = store.getValueOrThrow();
         return { fields, customIssues, success: true, value };

@@ -1,5 +1,5 @@
 import { describe, expect, test, vi } from 'vitest';
-import { Path, FormiField, FormiFieldTree } from '../src/mod';
+import { FormiField, FormiFieldTree, Path } from '../src/mod';
 
 test('Traverse', () => {
   const tree = {

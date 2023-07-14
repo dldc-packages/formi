@@ -1,6 +1,6 @@
-import { SubscribeMethod } from '@dldc/pubsub';
-import { FieldsUpdateFn } from './FormiController.types';
-import {
+import type { SubscribeMethod } from '@dldc/pubsub';
+import type { FieldsUpdateFn } from './FormiController.types';
+import type {
   FormiFieldAny,
   FormiFieldChildren,
   FormiFieldIssue,
@@ -8,11 +8,11 @@ import {
   IFormiField,
   InputBase,
 } from './FormiField.types';
-import { FormiFieldTree } from './FormiFieldTree';
-import { FormiIssues } from './FormiIssue';
-import { FormiKey } from './FormiKey';
-import { ImmuWeakMap, ImmuWeakMapDraft } from './tools/ImmuWeakMap';
-import { Path } from './tools/Path';
+import type { FormiFieldTree } from './FormiFieldTree';
+import type { FormiIssues } from './FormiIssue';
+import type { FormiKey } from './FormiKey';
+import type { ImmuWeakMap, ImmuWeakMapDraft } from './tools/ImmuWeakMap';
+import type { Path } from './tools/Path';
 
 export interface IFieldState<Value, Issue, Children extends FormiFieldTree> {
   readonly key: FormiKey;

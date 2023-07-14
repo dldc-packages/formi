@@ -1,11 +1,11 @@
 import { Suub } from '@dldc/pubsub';
 import { FormiErrors, FormiInternalErrors } from './FormiError';
 import { FormiField } from './FormiField';
-import { FormiFieldAny, InputBase } from './FormiField.types';
+import type { FormiFieldAny, InputBase } from './FormiField.types';
 import { FormiFieldTree } from './FormiFieldTree';
-import { FormiIssue, FormiIssueBase, FormiIssues } from './FormiIssue';
-import { FormiKey } from './FormiKey';
-import {
+import type { FormiIssue, FormiIssueBase, FormiIssues } from './FormiIssue';
+import type { FormiKey } from './FormiKey';
+import type {
   DebugStateResult,
   FieldStateAny,
   FieldsStateMap,

@@ -1,7 +1,7 @@
 import { FormiErrors } from './FormiError';
-import { FormiFieldAny, FormiFieldIssue } from './FormiField.types';
+import type { FormiFieldAny, FormiFieldIssue } from './FormiField.types';
 import { FormiFieldTree } from './FormiFieldTree';
-import { FormiIssues, FormiIssuesItem } from './FormiIssue';
+import type { FormiIssues, FormiIssuesItem } from './FormiIssue';
 
 export interface FormiIssuesBuilder<AnyIssue> {
   readonly add: <F extends FormiFieldAny>(field: F, issue: FormiFieldIssue<F>) => void;

@@ -1,9 +1,9 @@
-import { z } from 'zod';
-import { FIELD_RESTORE_FROM_PATHS, FIELD_TYPES, FIELD_VALIDATE_FN } from './FormiField';
-import { FormiFieldTree, FormiFieldTreeValue } from './FormiFieldTree';
-import { FormiIssueZod } from './FormiIssue';
-import { FormiKey } from './FormiKey';
-import { Path } from './tools/Path';
+import type { z } from 'zod';
+import type { FIELD_RESTORE_FROM_PATHS, FIELD_TYPES, FIELD_VALIDATE_FN } from './FormiField';
+import type { FormiFieldTree, FormiFieldTreeValue } from './FormiFieldTree';
+import type { FormiIssueZod } from './FormiIssue';
+import type { FormiKey } from './FormiKey';
+import type { Path } from './tools/Path';
 
 export type InputBase<Children extends FormiFieldTree> = {
   values: Array<FormDataEntryValue>;

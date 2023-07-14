@@ -1,6 +1,6 @@
 import { FormiErrors } from './FormiError';
 import { FormiField } from './FormiField';
-import { FormiFieldAny, IFormiField } from './FormiField.types';
+import type { FormiFieldAny, IFormiField } from './FormiField.types';
 import { Path } from './tools/Path';
 
 export type FormiFieldTree = null | FormiFieldAny | FormiFieldTree[] | { [key: string]: FormiFieldTree };

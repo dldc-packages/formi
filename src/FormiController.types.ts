@@ -1,10 +1,10 @@
-import { SubscribeMethod } from '@dldc/pubsub';
-import { IS_FORM_CONTROLLER } from './FormiController';
-import { FormiFieldAny } from './FormiField.types';
-import { FormiFieldTree, FormiFieldTreeValue } from './FormiFieldTree';
-import { FormiIssues } from './FormiIssue';
-import { FormiIssuesBuilder } from './FormiIssuesBuilder';
-import { FormiState } from './FormiStore.types';
+import type { SubscribeMethod } from '@dldc/pubsub';
+import type { IS_FORM_CONTROLLER } from './FormiController';
+import type { FormiFieldAny } from './FormiField.types';
+import type { FormiFieldTree, FormiFieldTreeValue } from './FormiFieldTree';
+import type { FormiIssues } from './FormiIssue';
+import type { FormiIssuesBuilder } from './FormiIssuesBuilder';
+import type { FormiState } from './FormiStore.types';
 
 export type OnSubmitActions = {
   preventDefault: () => void;
