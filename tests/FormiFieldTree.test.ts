@@ -1,4 +1,5 @@
 import { describe, expect, test, vi } from 'vitest';
+import type { TFormiFieldTree } from '../src/mod';
 import { FormiField, FormiFieldTree, Path } from '../src/mod';
 
 test('Traverse', () => {
@@ -62,7 +63,7 @@ test('Find path', () => {
 
 describe('FormiFieldTree.restoreFromPaths', () => {
   test('Restore simple tree', () => {
-    const tree: FormiFieldTree = {
+    const tree: TFormiFieldTree = {
       foo: FormiField.value(),
       bar: FormiField.value(),
     };
@@ -74,7 +75,7 @@ describe('FormiFieldTree.restoreFromPaths', () => {
   });
 
   test('Restore repeat', () => {
-    const tree: FormiFieldTree = {
+    const tree: TFormiFieldTree = {
       repeat: FormiField.repeat(FormiField.value()),
     };
 
@@ -87,7 +88,7 @@ describe('FormiFieldTree.restoreFromPaths', () => {
   });
 
   test('Restore repeat with object', () => {
-    const tree: FormiFieldTree = {
+    const tree: TFormiFieldTree = {
       repeat: FormiField.repeat({
         foo: FormiField.value(),
       }),

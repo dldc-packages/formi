@@ -1,26 +1,26 @@
 import type { z } from 'zod';
 import type {
-  ChildrenUpdateFn,
-  CreateFieldOptions,
-  FormiFieldAny,
+  ICreateFieldOptions,
   IFormiField,
-  InputBase,
-  RestoreFromPaths,
-  ValidateFailure,
-  ValidateFn,
-  ValidateResult,
-  ValidateSuccess,
+  TChildrenUpdateFn,
+  TFormiFieldAny,
+  TInputBase,
+  TRestoreFromPaths,
+  TValidateFailure,
+  TValidateFn,
+  TValidateResult,
+  TValidateSuccess,
 } from './FormiField.types';
-import type { FormiFieldTreeValue } from './FormiFieldTree';
+import type { TFormiFieldTree, TFormiFieldTreeValue } from './FormiFieldTree';
 import { FormiFieldTree } from './FormiFieldTree';
 import type {
-  FormiIssueBase,
-  FormiIssueNonEmptyFile,
-  FormiIssueNotFile,
-  FormiIssueNotString,
-  FormiIssueNumber,
-  FormiIssueSingle,
-  FormiIssueZod,
+  TFormiIssueBase,
+  TFormiIssueNonEmptyFile,
+  TFormiIssueNotFile,
+  TFormiIssueNotString,
+  TFormiIssueNumber,
+  TFormiIssueSingle,
+  TFormiIssueZod,
 } from './FormiIssue';
 import { FormiKey } from './FormiKey';
 import type { Path } from './tools/Path';
@@ -59,12 +59,12 @@ export const FormiField = (() => {
     repeat,
   } as const;
 
-  function create<Value, Issue, Children extends FormiFieldTree>({
+  function create<Value, Issue, Children extends TFormiFieldTree>({
     key,
     children,
     validateFn,
     restoreFromPaths = null,
-  }: CreateFieldOptions<Value, Issue, Children>): IFormiField<Value, Issue, Children> {
+  }: ICreateFieldOptions<Value, Issue, Children>): IFormiField<Value, Issue, Children> {
     const currentValidateFn = validateFn;
 
     const self: IFormiField<Value, Issue, Children> = {
@@ -95,7 +95,7 @@ export const FormiField = (() => {
     }
 
     function validate<NextValue = Value, NextIssue = never>(
-      validateFn: ValidateFn<Value, NextValue, Issue | NextIssue>,
+      validateFn: TValidateFn<Value, NextValue, Issue | NextIssue>,
     ): IFormiField<NextValue, Issue | NextIssue, Children> {
       const nextValidate = (input: any) => {
         const prev = currentValidateFn(input);
@@ -112,7 +112,7 @@ export const FormiField = (() => {
       });
     }
 
-    function withChildren(update: Children | ChildrenUpdateFn<Children>): IFormiField<Value, Issue, Children> {
+    function withChildren(update: Children | TChildrenUpdateFn<Children>): IFormiField<Value, Issue, Children> {
       const nextChildren = typeof update === 'function' ? update(children) : update;
       return create({
         key: self.key,
@@ -124,7 +124,7 @@ export const FormiField = (() => {
 
     function zodValidate<NextValue = Value>(
       schema: z.Schema<NextValue>,
-    ): IFormiField<NextValue, Issue | FormiIssueZod, Children> {
+    ): IFormiField<NextValue, Issue | TFormiIssueZod, Children> {
       return validate(zodValidator(schema));
     }
   }
@@ -132,7 +132,7 @@ export const FormiField = (() => {
   // fields
 
   function base() {
-    return create<InputBase<null>, FormiIssueBase, null>({
+    return create<TInputBase<null>, TFormiIssueBase, null>({
       key: FormiKey(),
       children: null,
       validateFn: (input) => success(input),
@@ -176,10 +176,10 @@ export const FormiField = (() => {
     return file().validate(isNonEmptyFile);
   }
 
-  function group<Children extends FormiFieldTree>(
+  function group<Children extends TFormiFieldTree>(
     children: Children,
-  ): IFormiField<FormiFieldTreeValue<Children>, FormiIssueBase, Children> {
-    return create<FormiFieldTreeValue<Children>, FormiIssueBase, Children>({
+  ): IFormiField<TFormiFieldTreeValue<Children>, TFormiIssueBase, Children> {
+    return create<TFormiFieldTreeValue<Children>, TFormiIssueBase, Children>({
       key: FormiKey(),
       children,
       validateFn: (input) => success(input.children),
@@ -187,12 +187,12 @@ export const FormiField = (() => {
     });
   }
 
-  function repeat<Child extends FormiFieldTree>(
+  function repeat<Child extends TFormiFieldTree>(
     child: Child,
     initialCount: number = 1,
-  ): IFormiField<Array<FormiFieldTreeValue<Child>>, FormiIssueBase, Array<Child>> {
+  ): IFormiField<Array<TFormiFieldTreeValue<Child>>, TFormiIssueBase, Array<Child>> {
     const initialChildren = Array.from({ length: initialCount }, () => FormiFieldTree.clone(child));
-    return create<Array<FormiFieldTreeValue<Child>>, FormiIssueBase, Array<Child>>({
+    return create<Array<TFormiFieldTreeValue<Child>>, TFormiIssueBase, Array<Child>>({
       key: FormiKey(),
       children: initialChildren,
       validateFn: (input) => success(input.children) as any,
@@ -202,7 +202,7 @@ export const FormiField = (() => {
 
   // utils
 
-  function restoreRepeat<Child extends FormiFieldTree>(child: Child, paths: ReadonlyArray<Path>): Array<Child> {
+  function restoreRepeat<Child extends TFormiFieldTree>(child: Child, paths: ReadonlyArray<Path>): Array<Child> {
     let size = 0;
     const pathsByIndex = new Map<number, Array<Path>>();
     for (const path of paths) {
@@ -229,21 +229,21 @@ export const FormiField = (() => {
     return Boolean(field && field[FIELD_TYPES]);
   }
 
-  function getValidateFn(field: FormiFieldAny): ValidateFn<any, any, any> {
+  function getValidateFn(field: TFormiFieldAny): TValidateFn<any, any, any> {
     return field[FIELD_VALIDATE_FN];
   }
 
-  function getRestoreFromPaths(field: FormiFieldAny): RestoreFromPaths<any> | null {
+  function getRestoreFromPaths(field: TFormiFieldAny): TRestoreFromPaths<any> | null {
     return field[FIELD_RESTORE_FROM_PATHS];
   }
 
-  function zodValidator<T>(schema: z.Schema<T>): ValidateFn<any, T, FormiIssueZod> {
+  function zodValidator<T>(schema: z.Schema<T>): TValidateFn<any, T, TFormiIssueZod> {
     return (value) => {
       const result = schema.safeParse(value);
       if (result.success) {
         return { success: true, value: result.data };
       }
-      const issues = result.error.issues.map((issue): FormiIssueZod => ({ kind: 'ZodIssue', issue }));
+      const issues = result.error.issues.map((issue): TFormiIssueZod => ({ kind: 'ZodIssue', issue }));
       if (issues.length === 1) {
         return { success: false, issue: issues[0] };
       }
@@ -251,7 +251,7 @@ export const FormiField = (() => {
     };
   }
 
-  function isSingleValue(input: InputBase<null>): ValidateResult<FormDataEntryValue | null, FormiIssueSingle> {
+  function isSingleValue(input: TInputBase<null>): TValidateResult<FormDataEntryValue | null, TFormiIssueSingle> {
     if (input.values === null) {
       return success(null);
     }
@@ -264,39 +264,39 @@ export const FormiField = (() => {
     return failure({ kind: 'UnexpectedMultipleValues' });
   }
 
-  function isNotNull<Value>(input: Value | null): ValidateResult<Value, FormiIssueBase> {
+  function isNotNull<Value>(input: Value | null): TValidateResult<Value, TFormiIssueBase> {
     if (input === null) {
-      return failure<FormiIssueBase>({ kind: 'MissingField' });
+      return failure<TFormiIssueBase>({ kind: 'MissingField' });
     }
     return success<Value>(input);
   }
 
-  function isNotFile<Value>(input: Value | File): ValidateResult<Value, FormiIssueNotFile> {
+  function isNotFile<Value>(input: Value | File): TValidateResult<Value, TFormiIssueNotFile> {
     if (input instanceof FileOrBlob) {
-      return failure<FormiIssueNotFile>({ kind: 'UnexpectedFile' });
+      return failure<TFormiIssueNotFile>({ kind: 'UnexpectedFile' });
     }
     return success<Value>(input);
   }
 
-  function isNumber(input: string | null): ValidateResult<number | null, FormiIssueNumber> {
+  function isNumber(input: string | null): TValidateResult<number | null, TFormiIssueNumber> {
     if (input === '' || input === null) {
       return success<number | null>(null);
     }
     const numberValue = Number(input);
     if (Number.isNaN(numberValue)) {
-      return failure<FormiIssueNumber>({ kind: 'InvalidNumber', value: input });
+      return failure<TFormiIssueNumber>({ kind: 'InvalidNumber', value: input });
     }
     return success<number>(numberValue);
   }
 
-  function isDefined(input: any): ValidateResult<boolean, FormiIssueBase> {
+  function isDefined(input: any): TValidateResult<boolean, TFormiIssueBase> {
     if (input === null || input === undefined) {
       return success(false);
     }
     return success(true);
   }
 
-  function isFile(entry: FormDataEntryValue | null): ValidateResult<File, FormiIssueNotString> {
+  function isFile(entry: FormDataEntryValue | null): TValidateResult<File, TFormiIssueNotString> {
     if (entry === null) {
       return { success: false, issue: { kind: 'MissingField' } };
     }
@@ -306,19 +306,19 @@ export const FormiField = (() => {
     return { success: true, value: entry };
   }
 
-  function isNonEmptyFile(input: File): ValidateResult<File, FormiIssueNonEmptyFile> {
+  function isNonEmptyFile(input: File): TValidateResult<File, TFormiIssueNonEmptyFile> {
     if (input.size === 0) {
-      return failure<FormiIssueNonEmptyFile>({ kind: 'EmptyFile' });
+      return failure<TFormiIssueNonEmptyFile>({ kind: 'EmptyFile' });
     }
     return success(input);
   }
 })();
 
-export function success<Value>(value: Value): ValidateSuccess<Value> {
+export function success<Value>(value: Value): TValidateSuccess<Value> {
   return { success: true, value };
 }
 
-export function failure<Issue>(issue?: Issue | Array<Issue>): ValidateFailure<Issue> {
+export function failure<Issue>(issue?: Issue | Array<Issue>): TValidateFailure<Issue> {
   if (issue === undefined) {
     return { success: false };
   }

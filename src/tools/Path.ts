@@ -1,7 +1,7 @@
 import { ErreurType } from '@dldc/erreur';
 
-export type Key = string | number;
-export type RawPath = ReadonlyArray<Key>;
+export type TKey = string | number;
+export type TRawPath = ReadonlyArray<TKey>;
 
 const IS_PATH = Symbol('IS_PATH');
 
@@ -38,21 +38,21 @@ export const PathErrors = {
   ),
 };
 
-export type PathLike = RawPath | Path;
+export type TPathLike = TRawPath | Path;
 
 export interface Path {
   readonly [IS_PATH]: true;
-  readonly raw: RawPath;
+  readonly raw: TRawPath;
   readonly length: number;
-  readonly head: Key | null;
+  readonly head: TKey | null;
   readonly serialize: () => string;
   readonly toString: () => string;
-  readonly append: (...raw: ReadonlyArray<Key>) => Path;
-  readonly prepend: (...raw: ReadonlyArray<Key>) => Path;
+  readonly append: (...raw: ReadonlyArray<TKey>) => Path;
+  readonly prepend: (...raw: ReadonlyArray<TKey>) => Path;
   readonly shift: () => Path;
-  readonly splitHead: () => [Key | null, Path];
-  readonly splitHeadOrThrow: () => [Key, Path];
-  [Symbol.iterator](): Iterator<Key>;
+  readonly splitHead: () => [TKey | null, Path];
+  readonly splitHeadOrThrow: () => [TKey, Path];
+  [Symbol.iterator](): Iterator<TKey>;
 }
 
 export const Path = (() => {
@@ -66,7 +66,7 @@ export const Path = (() => {
     equal,
   });
 
-  function create(...raw: ReadonlyArray<Key>): Path {
+  function create(...raw: ReadonlyArray<TKey>): Path {
     let serialized: string | null = null;
 
     const self: Path = {
@@ -81,7 +81,7 @@ export const Path = (() => {
       shift,
       splitHead,
       splitHeadOrThrow,
-      [Symbol.iterator](): Iterator<Key> {
+      [Symbol.iterator](): Iterator<TKey> {
         return this.raw[Symbol.iterator]();
       },
     };
@@ -98,15 +98,15 @@ export const Path = (() => {
       return Path(...self.raw.slice(1));
     }
 
-    function append(...raw: ReadonlyArray<Key>): Path {
+    function append(...raw: ReadonlyArray<TKey>): Path {
       return Path(...self.raw, ...raw);
     }
 
-    function prepend(...raw: ReadonlyArray<Key>): Path {
+    function prepend(...raw: ReadonlyArray<TKey>): Path {
       return Path(...raw, ...self.raw);
     }
 
-    function splitHead(): [Key | null, Path] {
+    function splitHead(): [TKey | null, Path] {
       if (raw.length === 0) {
         return [null, Path()];
       }
@@ -114,7 +114,7 @@ export const Path = (() => {
       return [head, Path(...tail)];
     }
 
-    function splitHeadOrThrow(): [Key, Path] {
+    function splitHeadOrThrow(): [TKey, Path] {
       const [head, tail] = splitHead();
       if (head === null) {
         throw PathErrors.CannotSplitEmpty.create();
@@ -123,7 +123,7 @@ export const Path = (() => {
     }
   }
 
-  function equal(a: PathLike, b: PathLike): boolean {
+  function equal(a: TPathLike, b: TPathLike): boolean {
     const aRaw = isPath(a) ? a.raw : a;
     const bRaw = isPath(b) ? b.raw : b;
     return aRaw.length === bRaw.length && aRaw.every((key, i) => key === bRaw[i]);
@@ -133,7 +133,7 @@ export const Path = (() => {
     return Boolean(path && path[IS_PATH] === true);
   }
 
-  function validatePathItem<V extends Key>(item: V): V {
+  function validatePathItem<V extends TKey>(item: V): V {
     if (typeof item === 'number') {
       if (Number.isInteger(item) && item >= 0 && item < Number.MAX_SAFE_INTEGER) {
         return item;
@@ -150,7 +150,7 @@ export const Path = (() => {
    * ["a", "b", "c"] => "a.b.c"
    * ["a", 0, "b"] => "a[0].b"
    */
-  function serialize(path: PathLike): string {
+  function serialize(path: TPathLike): string {
     const raw = Path.isPath(path) ? path.raw : path;
 
     let result = '';
@@ -180,9 +180,9 @@ export const Path = (() => {
     );
   }
 
-  function pathFrom(...items: Array<Key>): Path;
-  function pathFrom(path: PathLike): Path;
-  function pathFrom(...args: [PathLike] | Array<Key>): Path {
+  function pathFrom(...items: Array<TKey>): Path;
+  function pathFrom(path: TPathLike): Path;
+  function pathFrom(...args: [TPathLike] | Array<TKey>): Path {
     if (args.length === 1) {
       const arg = args[0];
       if (Path.isPath(arg)) {

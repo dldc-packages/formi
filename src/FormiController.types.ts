@@ -1,68 +1,68 @@
 import type { SubscribeMethod } from '@dldc/pubsub';
 import type { IS_FORM_CONTROLLER } from './FormiController';
-import type { FormiFieldAny } from './FormiField.types';
-import type { FormiFieldTree, FormiFieldTreeValue } from './FormiFieldTree';
-import type { FormiIssues } from './FormiIssue';
-import type { FormiIssuesBuilder } from './FormiIssuesBuilder';
-import type { FormiState } from './FormiStore.types';
+import type { TFormiFieldAny } from './FormiField.types';
+import type { TFormiFieldTree, TFormiFieldTreeValue } from './FormiFieldTree';
+import type { TFormiIssues } from './FormiIssue';
+import type { IFormiIssuesBuilder } from './FormiIssuesBuilder';
+import type { IFormiState } from './FormiStore.types';
 
-export type OnSubmitActions = {
+export interface IOnSubmitActions {
   preventDefault: () => void;
   stopPropagation: () => void;
   reset: () => void;
-};
+}
 
-export type OnSubmit<Tree extends FormiFieldTree> = (
-  data: { value: FormiFieldTreeValue<Tree>; formData: FormData },
-  actions: OnSubmitActions,
+export type TOnSubmit<Tree extends TFormiFieldTree> = (
+  data: { value: TFormiFieldTreeValue<Tree>; formData: FormData },
+  actions: IOnSubmitActions,
 ) => void;
 
-export type FormiResult<Tree extends FormiFieldTree> =
+export type TFormiResult<Tree extends TFormiFieldTree> =
   | {
       success: true;
-      value: FormiFieldTreeValue<Tree>;
+      value: TFormiFieldTreeValue<Tree>;
       fields: Tree;
-      customIssues: FormiIssuesBuilder<unknown>;
+      customIssues: IFormiIssuesBuilder<unknown>;
     }
   | {
       success: false;
-      issues: FormiIssues<unknown>;
+      issues: TFormiIssues<unknown>;
       fields: Tree;
-      customIssues: FormiIssuesBuilder<unknown>;
+      customIssues: IFormiIssuesBuilder<unknown>;
     };
 
-export type FieldsUpdateFn<F extends FormiFieldTree> = (fields: F) => F;
+export type TFieldsUpdateFn<F extends TFormiFieldTree> = (fields: F) => F;
 
-export interface IFormiController<Tree extends FormiFieldTree> {
+export interface IFormiController<Tree extends TFormiFieldTree> {
   readonly [IS_FORM_CONTROLLER]: true;
   readonly formName: string;
 
-  readonly getState: () => FormiState;
-  readonly subscribe: SubscribeMethod<FormiState>;
+  readonly getState: () => IFormiState;
+  readonly subscribe: SubscribeMethod<IFormiState>;
 
   readonly submit: (data: FormData) => void;
-  readonly getResult: () => FormiResult<Tree>;
-  readonly setIssues: (issues: FormiIssues<any>) => void;
-  readonly setOnSubmit: (onSubmit: OnSubmit<Tree>) => void;
+  readonly getResult: () => TFormiResult<Tree>;
+  readonly setIssues: (issues: TFormiIssues<any>) => void;
+  readonly setOnSubmit: (onSubmit: TOnSubmit<Tree>) => void;
   readonly setFields: (update: Tree | ((prev: Tree) => Tree)) => void;
   readonly getFields: () => Tree;
   /**
    * Revalidate the given fields.
    * If no fields are given, all fields will be revalidated.
    */
-  readonly revalidate: (...fields: FormiFieldAny[]) => void;
+  readonly revalidate: (...fields: TFormiFieldAny[]) => void;
 
   readonly unmount: () => void;
   readonly mount: (formEl: HTMLFormElement) => void;
 }
 
-export type FormiControllerOptions<Tree extends FormiFieldTree> = {
+export interface IFormiControllerOptions<Tree extends TFormiFieldTree> {
   formName: string;
   initialFields: Tree;
-  initialIssues?: FormiIssues<any>;
-  onSubmit?: OnSubmit<Tree>;
+  initialIssues?: TFormiIssues<any>;
+  onSubmit?: TOnSubmit<Tree>;
   onReset?: () => void;
   validateOnMount?: boolean;
-};
+}
 
-export type FormiControllerAny = IFormiController<any>;
+export type TFormiControllerAny = IFormiController<any>;

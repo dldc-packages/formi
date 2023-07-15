@@ -1,16 +1,16 @@
 import { FormiErrors } from './FormiError';
 import { FormiField } from './FormiField';
-import type { FormiFieldAny, IFormiField } from './FormiField.types';
+import type { IFormiField, TFormiFieldAny } from './FormiField.types';
 import { Path } from './tools/Path';
 
-export type FormiFieldTree = null | FormiFieldAny | FormiFieldTree[] | { [key: string]: FormiFieldTree };
+export type TFormiFieldTree = null | TFormiFieldAny | TFormiFieldTree[] | { [key: string]: TFormiFieldTree };
 
-export type FormiFieldTreeValue<Tree extends FormiFieldTree> = Tree extends IFormiField<infer V, any, any>
+export type TFormiFieldTreeValue<Tree extends TFormiFieldTree> = Tree extends IFormiField<infer V, any, any>
   ? V
-  : Tree extends Array<infer Inner extends FormiFieldTree>
-  ? ReadonlyArray<FormiFieldTreeValue<Inner>>
-  : Tree extends { [key: string]: FormiFieldAny }
-  ? { readonly [K in keyof Tree]: FormiFieldTreeValue<Tree[K]> }
+  : Tree extends Array<infer Inner extends TFormiFieldTree>
+  ? ReadonlyArray<TFormiFieldTreeValue<Inner>>
+  : Tree extends { [key: string]: TFormiFieldAny }
+  ? { readonly [K in keyof Tree]: TFormiFieldTreeValue<Tree[K]> }
   : null;
 
 export const FormiFieldTree = (() => {
@@ -28,14 +28,14 @@ export const FormiFieldTree = (() => {
   /**
    * Wrap fields in a group if they are not already a group or a single fields.
    */
-  function wrap(fields: FormiFieldTree): FormiFieldAny {
+  function wrap(fields: TFormiFieldTree): TFormiFieldAny {
     if (FormiField.utils.isFormiField(fields)) {
       return fields;
     }
     return FormiField.group(fields);
   }
 
-  function unwrap(fields: FormiFieldAny, wrapped: boolean): FormiFieldTree {
+  function unwrap(fields: TFormiFieldAny, wrapped: boolean): TFormiFieldTree {
     if (wrapped) {
       return fields.children;
     }
@@ -43,10 +43,10 @@ export const FormiFieldTree = (() => {
   }
 
   function traverse<T>(
-    tree: FormiFieldTree,
-    visitor: (field: FormiFieldAny, path: Path, next: () => Array<T>) => T,
+    tree: TFormiFieldTree,
+    visitor: (field: TFormiFieldAny, path: Path, next: () => Array<T>) => T,
   ): Array<T> {
-    function next(current: FormiFieldTree, base: Path): Array<T> {
+    function next(current: TFormiFieldTree, base: Path): Array<T> {
       return getChildren(current, base).map(({ item, path }) => {
         return visitor(item, path, () => next(item.children, path));
       });
@@ -54,7 +54,7 @@ export const FormiFieldTree = (() => {
     return next(tree, Path());
   }
 
-  function getChildren(tree: FormiFieldTree, base: Path): Array<{ path: Path; item: FormiFieldAny }> {
+  function getChildren(tree: TFormiFieldTree, base: Path): Array<{ path: Path; item: TFormiFieldAny }> {
     if (tree === null) {
       return [];
     }
@@ -67,7 +67,7 @@ export const FormiFieldTree = (() => {
     return Object.entries(tree).flatMap(([key, item]) => getChildren(item, base.append(key)));
   }
 
-  function fieldPath(tree: FormiFieldTree, field: FormiFieldAny): Path | null {
+  function fieldPath(tree: TFormiFieldTree, field: TFormiFieldAny): Path | null {
     const found: Array<Path> = [];
     traverse(tree, (item, path, next) => {
       if (item === field) {
@@ -84,7 +84,7 @@ export const FormiFieldTree = (() => {
     return found[0];
   }
 
-  function getChildrenByKey(tree: FormiFieldTree, key: string | number): FormiFieldTree | null {
+  function getChildrenByKey(tree: TFormiFieldTree, key: string | number): TFormiFieldTree | null {
     if (tree === null) {
       return null;
     }
@@ -103,7 +103,7 @@ export const FormiFieldTree = (() => {
     return tree[key] ?? null;
   }
 
-  function findByPath(tree: FormiFieldTree, path: Path): FormiFieldAny | null {
+  function findByPath(tree: TFormiFieldTree, path: Path): TFormiFieldAny | null {
     const pathResolved = Path.from(path);
     let current = tree;
     for (const pathItem of pathResolved) {
@@ -119,7 +119,7 @@ export const FormiFieldTree = (() => {
     return null;
   }
 
-  function clone<Tree extends FormiFieldTree>(tree: Tree): Tree {
+  function clone<Tree extends TFormiFieldTree>(tree: Tree): Tree {
     if (tree === null) {
       return tree;
     }
@@ -136,7 +136,7 @@ export const FormiFieldTree = (() => {
    * Given the initial tree and a list of paths, restore the tree
    * (mainly array items to restore the correct number of items)
    */
-  function restoreFromPaths<Tree extends FormiFieldTree>(tree: Tree, paths: ReadonlyArray<Path>): Tree {
+  function restoreFromPaths<Tree extends TFormiFieldTree>(tree: Tree, paths: ReadonlyArray<Path>): Tree {
     if (paths.length === 0) {
       return tree;
     }
@@ -145,7 +145,7 @@ export const FormiFieldTree = (() => {
     }
     if (FormiField.utils.isFormiField(tree)) {
       const restore = FormiField.utils.getRestoreFromPaths(tree);
-      return tree.withChildren((prev: FormiFieldTree) => {
+      return tree.withChildren((prev: TFormiFieldTree) => {
         if (!restore) {
           return restoreFromPaths(prev, paths);
         }
@@ -166,7 +166,7 @@ export const FormiFieldTree = (() => {
         }
         list.push(rest);
       }
-      return tree.map((item, index): FormiFieldTree => {
+      return tree.map((item, index): TFormiFieldTree => {
         const paths = pathsByIndex.get(index) ?? [];
         return restoreFromPaths(item, paths);
       }) as Tree;
@@ -186,7 +186,7 @@ export const FormiFieldTree = (() => {
       list.push(rest);
     }
     return Object.fromEntries(
-      Object.entries(tree).map(([key, value]): [string, FormiFieldTree] => {
+      Object.entries(tree).map(([key, value]): [string, TFormiFieldTree] => {
         const paths = pathsByKey.get(key) ?? [];
         return [key, restoreFromPaths(value, paths)];
       }),

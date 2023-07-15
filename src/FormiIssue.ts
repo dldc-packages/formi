@@ -1,26 +1,26 @@
 import type { ZodIssue } from 'zod';
-import type { RawPath } from './tools/Path';
+import type { TRawPath } from './tools/Path';
 
-export type FormiIssuesItem<Issue> = { path: RawPath; issues: Array<Issue> };
-export type FormiIssues<Issue> = Array<FormiIssuesItem<Issue>>;
+export type TFormiIssuesItem<Issue> = { path: TRawPath; issues: Array<Issue> };
+export type TFormiIssues<Issue> = Array<TFormiIssuesItem<Issue>>;
 
-export type FormiIssueBase =
+export type TFormiIssueBase =
   | { kind: 'FieldNotMounted' }
   | { kind: 'ValidationError'; error: unknown }
   | { kind: 'MissingField' };
 
-export type FormiIssueSingle = { kind: 'UnexpectedMultipleValues' };
-export type FormiIssueZod = FormiIssueBase | { kind: 'ZodIssue'; issue: ZodIssue };
-export type FormiIssueNotFile = FormiIssueBase | { kind: 'UnexpectedFile' };
-export type FormiIssueNotString = FormiIssueBase | { kind: 'UnexpectedString' };
-export type FormiIssueNumber = FormiIssueBase | { kind: 'InvalidNumber'; value: string };
-export type FormiIssueNonEmptyFile = FormiIssueBase | { kind: 'EmptyFile' };
+export type TFormiIssueSingle = { kind: 'UnexpectedMultipleValues' };
+export type TFormiIssueZod = TFormiIssueBase | { kind: 'ZodIssue'; issue: ZodIssue };
+export type TFormiIssueNotFile = TFormiIssueBase | { kind: 'UnexpectedFile' };
+export type TFormiIssueNotString = TFormiIssueBase | { kind: 'UnexpectedString' };
+export type TFormiIssueNumber = TFormiIssueBase | { kind: 'InvalidNumber'; value: string };
+export type TFormiIssueNonEmptyFile = TFormiIssueBase | { kind: 'EmptyFile' };
 
-export type FormiIssue =
-  | FormiIssueBase
-  | FormiIssueSingle
-  | FormiIssueNotFile
-  | FormiIssueNotString
-  | FormiIssueNumber
-  | FormiIssueNonEmptyFile
-  | FormiIssueZod;
+export type TFormiIssue =
+  | TFormiIssueBase
+  | TFormiIssueSingle
+  | TFormiIssueNotFile
+  | TFormiIssueNotString
+  | TFormiIssueNumber
+  | TFormiIssueNonEmptyFile
+  | TFormiIssueZod;

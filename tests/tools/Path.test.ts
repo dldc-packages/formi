@@ -1,9 +1,9 @@
 import { describe, expect, test } from 'vitest';
-import type { RawPath } from '../../src/mod';
+import type { TRawPath } from '../../src/mod';
 import { Path } from '../../src/mod';
 
 describe('serialize / parse', () => {
-  const testCases: Array<[RawPath, string]> = [
+  const testCases: Array<[TRawPath, string]> = [
     [[], ''],
     [['foo'], 'foo'],
     [['a', 42, 'b'], 'a[42].b'],
@@ -22,7 +22,7 @@ describe('serialize / parse', () => {
     expect(Path.serialize(path)).toBe(expected);
   });
 
-  test.each(testCases.map(([path, str]): [string, RawPath] => [str, path]))('Parse %s into %j', (str, expected) => {
+  test.each(testCases.map(([path, str]): [string, TRawPath] => [str, path]))('Parse %s into %j', (str, expected) => {
     expect(Path.parse(str).raw).toEqual(expected);
   });
 });

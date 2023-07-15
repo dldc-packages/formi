@@ -1,29 +1,29 @@
 import type { SubscribeMethod } from '@dldc/pubsub';
-import type { FieldsUpdateFn } from './FormiController.types';
+import type { TFieldsUpdateFn } from './FormiController.types';
 import type {
-  FormiFieldAny,
-  FormiFieldChildren,
-  FormiFieldIssue,
-  FormiFieldValue,
   IFormiField,
-  InputBase,
+  TFormiFieldAny,
+  TFormiFieldChildren,
+  TFormiFieldIssue,
+  TFormiFieldValue,
+  TInputBase,
 } from './FormiField.types';
-import type { FormiFieldTree } from './FormiFieldTree';
-import type { FormiIssues } from './FormiIssue';
-import type { FormiKey } from './FormiKey';
-import type { ImmuWeakMap, ImmuWeakMapDraft } from './tools/ImmuWeakMap';
+import type { TFormiFieldTree } from './FormiFieldTree';
+import type { TFormiIssues } from './FormiIssue';
+import type { IFormiKey } from './FormiKey';
+import type { IImmuWeakMap, IImmuWeakMapDraft } from './tools/ImmuWeakMap';
 import type { Path } from './tools/Path';
 
-export interface IFieldState<Value, Issue, Children extends FormiFieldTree> {
-  readonly key: FormiKey;
+export interface IFieldState<Value, Issue, Children extends TFormiFieldTree> {
+  readonly key: IFormiKey;
   readonly path: Path;
   readonly name: string; // path as string
   // All field keys (self + children recursively)
   // This is used to know which fields to update when a field changes
-  readonly keys: ReadonlySet<FormiKey>;
+  readonly keys: ReadonlySet<IFormiKey>;
 
-  readonly initialRawValue: InputBase<Children> | undefined;
-  readonly rawValue: InputBase<Children> | undefined;
+  readonly initialRawValue: TInputBase<Children> | undefined;
+  readonly rawValue: TInputBase<Children> | undefined;
   readonly value: Value | undefined;
   readonly issues: null | Array<Issue>;
   readonly touchedIssues: null | Array<Issue>;
@@ -34,18 +34,18 @@ export interface IFieldState<Value, Issue, Children extends FormiFieldTree> {
   readonly isSubmitted: boolean;
 }
 
-export type FieldStateOf<Field extends FormiFieldAny> = IFieldState<
-  FormiFieldValue<Field>,
-  FormiFieldIssue<Field>,
-  FormiFieldChildren<Field>
+export type TFieldStateOf<Field extends TFormiFieldAny> = IFieldState<
+  TFormiFieldValue<Field>,
+  TFormiFieldIssue<Field>,
+  TFormiFieldChildren<Field>
 >;
 
-export type FieldStateAny = IFieldState<any, any, any>;
+export type TFieldStateAny = IFieldState<any, any, any>;
 
-export type FieldsStateMap = ImmuWeakMap<FormiKey, FieldStateAny>;
-export type FieldsStateMapDraft = ImmuWeakMapDraft<FormiKey, FieldStateAny>;
+export type TFieldsStateMap = IImmuWeakMap<IFormiKey, TFieldStateAny>;
+export type TFieldsStateMapDraft = IImmuWeakMapDraft<IFormiKey, TFieldStateAny>;
 
-export type FormiStoreActions =
+export type TFormiStoreActions =
   | { type: 'Mount'; data: FormData }
   | {
       type: 'Change';
@@ -54,44 +54,44 @@ export type FormiStoreActions =
       touched: boolean;
       // All fields that need to be updated
       // null means all fields
-      fields: ReadonlyArray<FormiFieldAny> | null;
+      fields: ReadonlyArray<TFormiFieldAny> | null;
     }
   | { type: 'Submit'; data: FormData }
   | { type: 'Reset'; data: FormData }
   | {
       // This action is triggered when controller.setIssues is called
       type: 'SetIssues';
-      issues: FormiIssues<any>;
+      issues: TFormiIssues<any>;
     }
   | {
       // This action updated the shape of the form
       type: 'SetFields';
-      fields: FormiFieldTree | FieldsUpdateFn<FormiFieldTree>;
+      fields: TFormiFieldTree | TFieldsUpdateFn<TFormiFieldTree>;
     };
 
-export type RootFormiField = IFormiField<any, any, FormiFieldTree>;
+export type TRootFormiField = IFormiField<any, any, TFormiFieldTree>;
 
-export interface FormiState {
+export interface IFormiState {
   // If the root fields is an object of fields we wrap it in a group
   readonly rootFieldWrapped: boolean;
   // The tree of fields
-  readonly rootField: RootFormiField;
+  readonly rootField: TRootFormiField;
   // State for each field
-  readonly states: FieldsStateMap;
+  readonly states: TFieldsStateMap;
 }
 
-export type DebugStateResult = Array<{ field: FormiFieldAny; state: FieldStateAny }>;
+export type TDebugStateResult = Array<{ field: TFormiFieldAny; state: TFieldStateAny }>;
 
 export interface IFormiStore {
-  readonly subscribe: SubscribeMethod<FormiState>;
-  readonly getState: () => FormiState;
-  readonly getTree: () => FormiFieldTree;
-  readonly dispatch: (action: FormiStoreActions) => FormiState;
+  readonly subscribe: SubscribeMethod<IFormiState>;
+  readonly getState: () => IFormiState;
+  readonly getTree: () => TFormiFieldTree;
+  readonly dispatch: (action: TFormiStoreActions) => IFormiState;
   // utils
   readonly hasErrors: () => boolean;
   readonly getValueOrThrow: () => any;
-  readonly getIssuesOrThrow: () => FormiIssues<any>;
+  readonly getIssuesOrThrow: () => TFormiIssues<any>;
 
-  readonly debugState: (state: FormiState) => DebugStateResult;
-  readonly logDegugState: (state: FormiState) => void;
+  readonly debugState: (state: IFormiState) => TDebugStateResult;
+  readonly logDegugState: (state: IFormiState) => void;
 }

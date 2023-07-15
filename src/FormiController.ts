@@ -1,14 +1,15 @@
 import type {
-  FormiControllerOptions,
-  FormiResult,
   IFormiController,
-  OnSubmit,
-  OnSubmitActions,
+  IFormiControllerOptions,
+  IOnSubmitActions,
+  TFormiResult,
+  TOnSubmit,
 } from './FormiController.types';
 import { FormiErrors } from './FormiError';
-import type { FormiFieldAny } from './FormiField.types';
+import type { TFormiFieldAny } from './FormiField.types';
+import type { TFormiFieldTree } from './FormiFieldTree';
 import { FormiFieldTree } from './FormiFieldTree';
-import type { FormiIssues } from './FormiIssue';
+import type { TFormiIssues } from './FormiIssue';
 import { FormiIssuesBuilder } from './FormiIssuesBuilder';
 import { FormiStore } from './FormiStore';
 import { Path } from './tools/Path';
@@ -18,10 +19,10 @@ export const IS_FORM_CONTROLLER = Symbol('IS_FORM_CONTROLLER');
 export const FormiController = (() => {
   return Object.assign(create, { validate });
 
-  function validate<Tree extends FormiFieldTree>(
-    options: FormiControllerOptions<Tree>,
+  function validate<Tree extends TFormiFieldTree>(
+    options: IFormiControllerOptions<Tree>,
     data: FormData,
-  ): FormiResult<Tree> {
+  ): TFormiResult<Tree> {
     const formPaths: Path[] = [];
     Array.from(data.keys())
       .map((p) => Path.from(p))
@@ -38,17 +39,17 @@ export const FormiController = (() => {
     return controller.getResult();
   }
 
-  function create<Tree extends FormiFieldTree>({
+  function create<Tree extends TFormiFieldTree>({
     formName,
     validateOnMount = true,
     initialFields,
     initialIssues,
     onSubmit: userOnSubmit,
     onReset: userOnReset,
-  }: FormiControllerOptions<Tree>): IFormiController<Tree> {
+  }: IFormiControllerOptions<Tree>): IFormiController<Tree> {
     Path.validatePathItem(formName);
 
-    let onSubmit: OnSubmit<Tree> | null = userOnSubmit ?? null;
+    let onSubmit: TOnSubmit<Tree> | null = userOnSubmit ?? null;
     let formEl: HTMLFormElement | null = null;
 
     const store = FormiStore(formName, initialFields, initialIssues);
@@ -74,11 +75,11 @@ export const FormiController = (() => {
 
     return self;
 
-    function setOnSubmit(newOnSubmit: OnSubmit<Tree>) {
+    function setOnSubmit(newOnSubmit: TOnSubmit<Tree>) {
       onSubmit = newOnSubmit;
     }
 
-    function setIssues(issues: FormiIssues<any>) {
+    function setIssues(issues: TFormiIssues<any>) {
       store.dispatch({ type: 'SetIssues', issues });
     }
 
@@ -86,14 +87,14 @@ export const FormiController = (() => {
       store.dispatch({ type: 'SetFields', fields: fields as any });
     }
 
-    function revalidate(...fields: FormiFieldAny[]) {
+    function revalidate(...fields: TFormiFieldAny[]) {
       const form = getForm();
       const data = new FormData(form);
       store.dispatch({ type: 'Change', data, touched: false, fields: fields.length === 0 ? null : fields });
       return;
     }
 
-    function getResult(): FormiResult<Tree> {
+    function getResult(): TFormiResult<Tree> {
       // const { rootField } = store.getState();
       const fields = store.getTree() as Tree;
       // QUESTION: is it OK to use the unwrapped fields here?
@@ -117,7 +118,7 @@ export const FormiController = (() => {
       return store.getTree() as Tree;
     }
 
-    function submit(data: FormData, actions?: OnSubmitActions) {
+    function submit(data: FormData, actions?: IOnSubmitActions) {
       store.dispatch({ type: 'Submit', data });
       if (store.hasErrors()) {
         actions?.preventDefault();

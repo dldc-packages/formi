@@ -1,7 +1,7 @@
 import { ErreurType } from '@dldc/erreur';
-import type { FormiFieldAny } from './FormiField.types';
-import type { FormiFieldTree } from './FormiFieldTree';
-import type { FormiKey } from './FormiKey';
+import type { TFormiFieldAny } from './FormiField.types';
+import type { TFormiFieldTree } from './FormiFieldTree';
+import type { IFormiKey } from './FormiKey';
 import type { Path } from './tools/Path';
 
 export interface IInternal_UnhandledAction {
@@ -9,7 +9,7 @@ export interface IInternal_UnhandledAction {
 }
 
 export interface IInternal_DuplicateKey {
-  readonly key: FormiKey;
+  readonly key: IFormiKey;
   readonly current: Path;
   readonly conflict: Path;
 }
@@ -28,7 +28,7 @@ export const FormiInternalErrors = {
   ),
   Internal_DuplicateKey: ErreurType.defineWithTransform(
     'Internal_DuplicateKey',
-    (key: FormiKey, current: Path, conflict: Path): IInternal_DuplicateKey => ({ key, current, conflict }),
+    (key: IFormiKey, current: Path, conflict: Path): IInternal_DuplicateKey => ({ key, current, conflict }),
     (err, provider, data) => {
       return err
         .with(provider)
@@ -51,18 +51,18 @@ export interface IMissingFormRef {
 }
 
 export interface IReusedField {
-  tree: FormiFieldTree;
-  field: FormiFieldAny;
+  tree: TFormiFieldTree;
+  field: TFormiFieldAny;
   paths: Array<Path>;
 }
 
 export interface IFieldNotFound {
-  tree: FormiFieldTree;
-  field: FormiFieldAny;
+  tree: TFormiFieldTree;
+  field: TFormiFieldAny;
 }
 
 export interface IValidateSuccessWithoutValue {
-  field: FormiFieldAny;
+  field: TFormiFieldAny;
   input: any;
 }
 
@@ -75,7 +75,7 @@ export interface IGetValueUnresolved {
 }
 
 export interface IMissingFieldState {
-  field: FormiFieldAny;
+  field: TFormiFieldAny;
 }
 
 export const FormiErrors = {
@@ -89,7 +89,7 @@ export const FormiErrors = {
   ),
   ReusedField: ErreurType.defineWithTransform(
     'ReusedField',
-    (tree: FormiFieldTree, field: FormiFieldAny, paths: Array<Path>): IReusedField => ({ tree, field, paths }),
+    (tree: TFormiFieldTree, field: TFormiFieldAny, paths: Array<Path>): IReusedField => ({ tree, field, paths }),
     (err, provider, data) => {
       return err
         .with(provider)
@@ -102,14 +102,14 @@ export const FormiErrors = {
   ),
   FieldNotFound: ErreurType.defineWithTransform(
     'FieldNotFound',
-    (tree: FormiFieldTree, field: FormiFieldAny): IFieldNotFound => ({ tree, field }),
+    (tree: TFormiFieldTree, field: TFormiFieldAny): IFieldNotFound => ({ tree, field }),
     (err, provider, data) => {
       return err.with(provider).withMessage(`Field "${data.field.key.toString()}" not found in tree.`);
     },
   ),
   ValidateSuccessWithoutValue: ErreurType.defineWithTransform(
     'ValidateSuccessWithoutValue',
-    (field: FormiFieldAny, input: any): IValidateSuccessWithoutValue => ({ field, input }),
+    (field: TFormiFieldAny, input: any): IValidateSuccessWithoutValue => ({ field, input }),
     (err, provider) => {
       return err
         .with(provider)
@@ -132,7 +132,7 @@ export const FormiErrors = {
   ),
   MissingFieldState: ErreurType.defineWithTransform(
     'MissingFieldState',
-    (field: FormiFieldAny): IMissingFieldState => ({ field }),
+    (field: TFormiFieldAny): IMissingFieldState => ({ field }),
     (err, provider, data) => {
       return err.with(provider).withMessage(`Missing field state for field "${data.field.key.toString()}"`);
     },

@@ -26,7 +26,7 @@ const IS_IMMU_WEAK_MAP = Symbol('IS_IMMU_WEAK_MAP');
 /**
  * An immutable WeakMap.
  */
-export interface ImmuWeakMap<K extends object, V> {
+export interface IImmuWeakMap<K extends object, V> {
   readonly [IS_IMMU_WEAK_MAP]: true;
   readonly get: (key: K) => V | undefined;
   readonly getOrThrow: (key: K) => V;
@@ -34,8 +34,8 @@ export interface ImmuWeakMap<K extends object, V> {
   /**
    * Create a draft of the map (see ImmuWeakMapDraft).
    */
-  readonly draft: () => ImmuWeakMapDraft<K, V>;
-  readonly produce: (update: (draft: ImmuWeakMapDraft<K, V>) => ImmuWeakMap<K, V>) => ImmuWeakMap<K, V>;
+  readonly draft: () => IImmuWeakMapDraft<K, V>;
+  readonly produce: (update: (draft: IImmuWeakMapDraft<K, V>) => IImmuWeakMap<K, V>) => IImmuWeakMap<K, V>;
 }
 
 export const ImmuWeakMap = (() => {
@@ -44,8 +44,8 @@ export const ImmuWeakMap = (() => {
     isImmuWeakMap,
   });
 
-  function create<K extends object, V>(data: WeakMap<K, V>): ImmuWeakMap<K, V> {
-    const self: ImmuWeakMap<K, V> = {
+  function create<K extends object, V>(data: WeakMap<K, V>): IImmuWeakMap<K, V> {
+    const self: IImmuWeakMap<K, V> = {
       [IS_IMMU_WEAK_MAP]: true,
       get,
       getOrThrow,
@@ -70,20 +70,20 @@ export const ImmuWeakMap = (() => {
       return data.has(key);
     }
 
-    function draft(): ImmuWeakMapDraft<K, V> {
+    function draft(): IImmuWeakMapDraft<K, V> {
       return ImmuWeakMapDraft(data, self);
     }
 
-    function produce(update: (draft: ImmuWeakMapDraft<K, V>) => ImmuWeakMap<K, V>): ImmuWeakMap<K, V> {
+    function produce(update: (draft: IImmuWeakMapDraft<K, V>) => IImmuWeakMap<K, V>): IImmuWeakMap<K, V> {
       return update(draft());
     }
   }
 
-  function isImmuWeakMap(val: any): val is ImmuWeakMap<any, any> {
+  function isImmuWeakMap(val: any): val is IImmuWeakMap<any, any> {
     return Boolean(val && val[IS_IMMU_WEAK_MAP] === true);
   }
 
-  function empty<K extends object, V>(): ImmuWeakMap<K, V> {
+  function empty<K extends object, V>(): IImmuWeakMap<K, V> {
     return create<K, V>(new WeakMap());
   }
 })();
@@ -95,7 +95,7 @@ const IS_IMMU_WEAK_MAP_DRAFT = Symbol('IS_IMMU_WEAK_MAP_DRAFT');
  * Once you are done, you can commit the changes to get a new ImmuWeakMap.
  * When you commit, you must provide all the keys that you want to keep.
  */
-export interface ImmuWeakMapDraft<K extends object, V> {
+export interface IImmuWeakMapDraft<K extends object, V> {
   readonly [IS_IMMU_WEAK_MAP_DRAFT]: true;
   readonly get: (key: K) => V | undefined;
   readonly getOrThrow: (key: K) => V;
@@ -104,19 +104,19 @@ export interface ImmuWeakMapDraft<K extends object, V> {
   readonly update: (key: K, updater: (prev: V | undefined) => V) => void;
   readonly updateOrThrow: (key: K, updater: (prev: V) => V) => void;
   readonly delete: (key: K) => void;
-  readonly commit: (allKeys: Iterable<K>) => ImmuWeakMap<K, V>;
+  readonly commit: (allKeys: Iterable<K>) => IImmuWeakMap<K, V>;
 }
 
 export const ImmuWeakMapDraft = (() => {
   return create;
 
-  function create<K extends object, V>(prev: WeakMap<K, V>, prevParent: ImmuWeakMap<K, V>): ImmuWeakMapDraft<K, V> {
+  function create<K extends object, V>(prev: WeakMap<K, V>, prevParent: IImmuWeakMap<K, V>): IImmuWeakMapDraft<K, V> {
     const deleted = new WeakSet<K>();
     const next = new WeakMap<K, V>();
 
     let changed = false;
 
-    const self: ImmuWeakMapDraft<K, V> = {
+    const self: IImmuWeakMapDraft<K, V> = {
       [IS_IMMU_WEAK_MAP_DRAFT]: true,
       get,
       getOrThrow,
@@ -192,7 +192,7 @@ export const ImmuWeakMapDraft = (() => {
       }
     }
 
-    function commit(allKeys: Iterable<K>): ImmuWeakMap<K, V> {
+    function commit(allKeys: Iterable<K>): IImmuWeakMap<K, V> {
       if (!changed) {
         return prevParent;
       }

@@ -1,30 +1,34 @@
 import { Suub } from '@dldc/pubsub';
 import { FormiErrors, FormiInternalErrors } from './FormiError';
 import { FormiField } from './FormiField';
-import type { FormiFieldAny, InputBase } from './FormiField.types';
-import { FormiFieldTree } from './FormiFieldTree';
-import type { FormiIssue, FormiIssueBase, FormiIssues } from './FormiIssue';
-import type { FormiKey } from './FormiKey';
+import type { TFormiFieldAny, TInputBase } from './FormiField.types';
+import { FormiFieldTree, type TFormiFieldTree } from './FormiFieldTree';
+import type { TFormiIssue, TFormiIssueBase, TFormiIssues } from './FormiIssue';
+import type { IFormiKey } from './FormiKey';
 import type {
-  DebugStateResult,
-  FieldStateAny,
-  FieldsStateMap,
-  FieldsStateMapDraft,
-  FormiState,
-  FormiStoreActions,
+  IFormiState,
   IFormiStore,
-  RootFormiField,
+  TDebugStateResult,
+  TFieldStateAny,
+  TFieldsStateMap,
+  TFieldsStateMapDraft,
+  TFormiStoreActions,
+  TRootFormiField,
 } from './FormiStore.types';
-import { ImmuWeakMap } from './tools/ImmuWeakMap';
+import { ImmuWeakMap } from './mod';
 import { Path } from './tools/Path';
 import { expectNever, isSetEqual, shallowEqual } from './utils';
 
 export const FormiStore = (() => {
   return create;
 
-  function create(formName: string, initialFields: FormiFieldTree, issues: FormiIssues<any> | undefined): IFormiStore {
-    let state: FormiState = createInitialState(formName, initialFields, issues);
-    const subscription = Suub.createSubscription<FormiState>();
+  function create(
+    formName: string,
+    initialFields: TFormiFieldTree,
+    issues: TFormiIssues<any> | undefined,
+  ): IFormiStore {
+    let state: IFormiState = createInitialState(formName, initialFields, issues);
+    const subscription = Suub.createSubscription<IFormiState>();
 
     return {
       subscribe: subscription.subscribe,
@@ -39,8 +43,8 @@ export const FormiStore = (() => {
       logDegugState,
     };
 
-    function dispatch(action: FormiStoreActions): FormiState {
-      let nextState: FormiState;
+    function dispatch(action: TFormiStoreActions): IFormiState {
+      let nextState: IFormiState;
       try {
         nextState = reducer(state, action);
       } catch (error) {
@@ -54,15 +58,15 @@ export const FormiStore = (() => {
       return state;
     }
 
-    function getState(): FormiState {
+    function getState(): IFormiState {
       return state;
     }
 
-    function getTree(): FormiFieldTree {
+    function getTree(): TFormiFieldTree {
       return FormiFieldTree.unwrap(state.rootField, state.rootFieldWrapped);
     }
 
-    function reducer(state: FormiState, action: FormiStoreActions): FormiState {
+    function reducer(state: IFormiState, action: TFormiStoreActions): IFormiState {
       if (action.type === 'Mount') {
         return updateStates(state, (draft, fields) => {
           FormiFieldTree.traverse<void>(fields, (field, _path, next) => {
@@ -104,7 +108,7 @@ export const FormiStore = (() => {
             }
             const result = runValidate(field, inputRes);
             const isTouched = prev.isTouched || expectedTouched;
-            const nextState: FieldStateAny = {
+            const nextState: TFieldStateAny = {
               ...prev,
               isTouched,
               hasExternalIssues: false,
@@ -141,7 +145,7 @@ export const FormiStore = (() => {
         return updateStates(state, (draft, fields) => {
           FormiFieldTree.traverse(fields, (field, _path, next) => {
             next();
-            draft.updateOrThrow(field.key, (prev): FieldStateAny => {
+            draft.updateOrThrow(field.key, (prev): TFieldStateAny => {
               const inputRes = getInput(draft, field, action.data);
               const result = runValidate(field, inputRes);
               const isTouched = false;
@@ -222,25 +226,25 @@ export const FormiStore = (() => {
     }
 
     function updateStates(
-      state: FormiState,
-      updater: (draft: FieldsStateMapDraft, fields: RootFormiField) => void,
-    ): FormiState {
+      state: IFormiState,
+      updater: (draft: TFieldsStateMapDraft, fields: TRootFormiField) => void,
+    ): IFormiState {
       const draft = state.states.draft();
       updater(draft, state.rootField);
       const nextStates = commiStatesDraft(draft, state.rootField);
       if (nextStates === state.states) {
         return state;
       }
-      const result: FormiState = { ...state, states: nextStates };
+      const result: IFormiState = { ...state, states: nextStates };
       return result;
     }
 
     function createInitialState(
       formName: string,
-      fields: FormiFieldTree,
-      issues: FormiIssues<any> | undefined,
-    ): FormiState {
-      const map = ImmuWeakMap.empty<FormiKey, FieldStateAny>();
+      fields: TFormiFieldTree,
+      issues: TFormiIssues<any> | undefined,
+    ): IFormiState {
+      const map = ImmuWeakMap.empty<IFormiKey, TFieldStateAny>();
       const draft = map.draft();
       const rootField = FormiFieldTree.wrap(fields);
       initializeFieldStateMap(formName, rootField, draft, issues);
@@ -251,12 +255,12 @@ export const FormiStore = (() => {
       };
     }
 
-    function commiStatesDraft(draft: FieldsStateMapDraft, rootField: RootFormiField): FieldsStateMap {
+    function commiStatesDraft(draft: TFieldsStateMapDraft, rootField: TRootFormiField): TFieldsStateMap {
       const rootState = draft.getOrThrow(rootField.key);
       return draft.commit(rootState.keys);
     }
 
-    function getFieldIssues(path: Path, issues: FormiIssues<any> | undefined) {
+    function getFieldIssues(path: Path, issues: TFormiIssues<any> | undefined) {
       const initialIssues = issues
         ?.filter((item) => Path.equal(item.path, path))
         .map((item) => item.issues)
@@ -266,11 +270,11 @@ export const FormiStore = (() => {
     }
 
     function createFieldState(
-      field: FormiFieldAny,
+      field: TFormiFieldAny,
       path: Path,
-      keys: Set<FormiKey>,
-      issues: FormiIssues<any> | undefined,
-    ): FieldStateAny {
+      keys: Set<IFormiKey>,
+      issues: TFormiIssues<any> | undefined,
+    ): TFieldStateAny {
       const issuesResolved = getFieldIssues(path, issues);
       return {
         key: field.key,
@@ -292,9 +296,9 @@ export const FormiStore = (() => {
 
     function initializeFieldStateMap(
       formName: string,
-      tree: FormiFieldTree,
-      draft: FieldsStateMapDraft,
-      issues: FormiIssues<any> | undefined,
+      tree: TFormiFieldTree,
+      draft: TFieldsStateMapDraft,
+      issues: TFormiIssues<any> | undefined,
     ): void {
       traverseWithKeys(formName, tree, (field, path, keys) => {
         const state = createFieldState(field, path, keys, issues);
@@ -309,12 +313,12 @@ export const FormiStore = (() => {
      */
     function traverseWithKeys(
       formName: string,
-      tree: FormiFieldTree,
-      visitor: (field: FormiFieldAny, path: Path, keys: Set<FormiKey>) => void,
+      tree: TFormiFieldTree,
+      visitor: (field: TFormiFieldAny, path: Path, keys: Set<IFormiKey>) => void,
     ) {
-      FormiFieldTree.traverse<{ path: Path; keys: Set<FormiKey> }>(tree, (field, path, next) => {
+      FormiFieldTree.traverse<{ path: Path; keys: Set<IFormiKey> }>(tree, (field, path, next) => {
         const sub = next();
-        const keysMap = new Map<FormiKey, Path>();
+        const keysMap = new Map<IFormiKey, Path>();
         const formPath = path.prepend(formName);
         keysMap.set(field.key, formPath);
         sub.forEach((item) => {
@@ -337,7 +341,7 @@ export const FormiStore = (() => {
       | { status: 'error'; issues: any[] }
       | { status: 'unkown' };
 
-    function runValidate(field: FormiFieldAny, input: GetInputResult): ValidateResult {
+    function runValidate(field: TFormiFieldAny, input: GetInputResult): ValidateResult {
       if (input.resolved === false) {
         // Don't run validate if children are not resolved
         return { status: 'unkown' };
@@ -360,14 +364,14 @@ export const FormiStore = (() => {
         }
         return { status: 'error', issues };
       } catch (error) {
-        const issue: FormiIssueBase = { kind: 'ValidationError', error };
+        const issue: TFormiIssueBase = { kind: 'ValidationError', error };
         return { status: 'error', issues: [issue] };
       }
     }
 
     type GetInputTreeResult = { resolved: false; input: null } | { resolved: true; input: unknown };
 
-    function getTreeInput(draft: FieldsStateMapDraft, field: FormiFieldTree): GetInputTreeResult {
+    function getTreeInput(draft: TFieldsStateMapDraft, field: TFormiFieldTree): GetInputTreeResult {
       if (field === null) {
         return { resolved: true, input: null };
       }
@@ -401,9 +405,9 @@ export const FormiStore = (() => {
       return { resolved: true, input };
     }
 
-    type GetInputResult = { resolved: false; input: null } | { resolved: true; input: InputBase<FormiFieldTree> };
+    type GetInputResult = { resolved: false; input: null } | { resolved: true; input: TInputBase<TFormiFieldTree> };
 
-    function getInput(draft: FieldsStateMapDraft, field: FormiFieldAny, data: FormData): GetInputResult {
+    function getInput(draft: TFieldsStateMapDraft, field: TFormiFieldAny, data: FormData): GetInputResult {
       const state = draft.getOrThrow(field.key);
       const values = data.getAll(state.name);
       const children = getTreeInput(draft, field.children);
@@ -415,7 +419,7 @@ export const FormiStore = (() => {
 
     type GetValueResult = { resolved: false } | { resolved: true; value: any };
 
-    function getValue(state: FieldStateAny): GetValueResult {
+    function getValue(state: TFieldStateAny): GetValueResult {
       if (state.isMounted === false) {
         return { resolved: false };
       }
@@ -428,7 +432,7 @@ export const FormiStore = (() => {
       return { resolved: true, value: state.value };
     }
 
-    type PartialFieldState_Result = Pick<FieldStateAny, 'value' | 'issues' | 'touchedIssues'>;
+    type PartialFieldState_Result = Pick<TFieldStateAny, 'value' | 'issues' | 'touchedIssues'>;
 
     function validateResultToPartialState(result: ValidateResult, isTouched: boolean): PartialFieldState_Result {
       if (result.status === 'success') {
@@ -443,9 +447,9 @@ export const FormiStore = (() => {
       return expectNever(result);
     }
 
-    type PartialFieldState_Input = Pick<FieldStateAny, 'isMounted' | 'isDirty' | 'initialRawValue' | 'rawValue'>;
+    type PartialFieldState_Input = Pick<TFieldStateAny, 'isMounted' | 'isDirty' | 'initialRawValue' | 'rawValue'>;
 
-    function inputToPartialState(prev: FieldStateAny, inputRes: GetInputResult): PartialFieldState_Input {
+    function inputToPartialState(prev: TFieldStateAny, inputRes: GetInputResult): PartialFieldState_Input {
       const { isMounted, initialRawValue, rawValue, isDirty } = prev;
       if (inputRes.resolved === false) {
         // ignore
@@ -501,14 +505,14 @@ export const FormiStore = (() => {
       return rootState.value;
     }
 
-    function getIssuesOrThrow(): FormiIssues<any> {
+    function getIssuesOrThrow(): TFormiIssues<any> {
       const { states, rootField } = getState();
-      const issues: FormiIssues<any> = [];
+      const issues: TFormiIssues<any> = [];
       FormiFieldTree.traverse(rootField, (field, path, next) => {
         next();
         const fieldState = states.getOrThrow(field.key);
         if (fieldState.isMounted === false) {
-          const issue: FormiIssue = { kind: 'FieldNotMounted' };
+          const issue: TFormiIssue = { kind: 'FieldNotMounted' };
           issues.push({ path: path.raw, issues: [issue] });
           return;
         }
@@ -519,18 +523,18 @@ export const FormiStore = (() => {
       return issues;
     }
 
-    function debugState(state: FormiState): DebugStateResult {
-      const result: Array<{ field: FormiFieldAny; state: FieldStateAny }> = [];
+    function debugState(state: IFormiState): TDebugStateResult {
+      const result: Array<{ field: TFormiFieldAny; state: TFieldStateAny }> = [];
       const { rootField, states } = state;
       FormiFieldTree.traverse(rootField, (field, _path, next) => {
-        const state = states.get(field.key) as FieldStateAny;
+        const state = states.get(field.key) as TFieldStateAny;
         result.push({ field, state });
         next();
       });
       return result;
     }
 
-    function logDegugState(state: FormiState): void {
+    function logDegugState(state: IFormiState): void {
       const result = debugState(state);
       console.group('FormiState');
       console.groupCollapsed('Fields');
@@ -546,7 +550,7 @@ export const FormiStore = (() => {
       console.groupEnd();
       console.groupEnd();
 
-      function logTree(tree: FormiFieldTree) {
+      function logTree(tree: TFormiFieldTree) {
         if (tree === null) {
           console.log('null');
           return;

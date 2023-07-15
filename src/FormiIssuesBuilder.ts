@@ -1,19 +1,20 @@
 import { FormiErrors } from './FormiError';
-import type { FormiFieldAny, FormiFieldIssue } from './FormiField.types';
+import type { TFormiFieldAny, TFormiFieldIssue } from './FormiField.types';
+import type { TFormiFieldTree } from './FormiFieldTree';
 import { FormiFieldTree } from './FormiFieldTree';
-import type { FormiIssues, FormiIssuesItem } from './FormiIssue';
+import type { TFormiIssues, TFormiIssuesItem } from './FormiIssue';
 
-export interface FormiIssuesBuilder<AnyIssue> {
-  readonly add: <F extends FormiFieldAny>(field: F, issue: FormiFieldIssue<F>) => void;
-  readonly getIssues: () => FormiIssues<AnyIssue>;
+export interface IFormiIssuesBuilder<AnyIssue> {
+  readonly add: <F extends TFormiFieldAny>(field: F, issue: TFormiFieldIssue<F>) => void;
+  readonly getIssues: () => TFormiIssues<AnyIssue>;
   readonly hasIssues: () => boolean;
 }
 
 export const FormiIssuesBuilder = (() => {
   return Object.assign(create, {});
 
-  function create<Tree extends FormiFieldTree, AnyIssue>(tree: Tree): FormiIssuesBuilder<AnyIssue> {
-    const map = new Map<FormiFieldAny, Array<any>>();
+  function create<Tree extends TFormiFieldTree, AnyIssue>(tree: Tree): IFormiIssuesBuilder<AnyIssue> {
+    const map = new Map<TFormiFieldAny, Array<any>>();
 
     return {
       add,
@@ -21,7 +22,7 @@ export const FormiIssuesBuilder = (() => {
       hasIssues,
     };
 
-    function getIssues(): FormiIssues<AnyIssue> {
+    function getIssues(): TFormiIssues<AnyIssue> {
       return issuesFromMap(tree, map);
     }
 
@@ -29,7 +30,7 @@ export const FormiIssuesBuilder = (() => {
       return map.size > 0;
     }
 
-    function add<F extends FormiFieldAny>(field: F, issue: FormiFieldIssue<F>) {
+    function add<F extends TFormiFieldAny>(field: F, issue: TFormiFieldIssue<F>) {
       const issues = map.get(field) ?? [];
       issues.push(issue);
       if (map.has(field) === false) {
@@ -38,9 +39,9 @@ export const FormiIssuesBuilder = (() => {
     }
   }
 
-  function issuesFromMap<Issue>(tree: FormiFieldTree, map: Map<FormiFieldAny, Array<Issue>>): FormiIssues<Issue> {
+  function issuesFromMap<Issue>(tree: TFormiFieldTree, map: Map<TFormiFieldAny, Array<Issue>>): TFormiIssues<Issue> {
     const issues = Array.from(map.entries())
-      .map(([field, issues]): FormiIssuesItem<Issue> | null => {
+      .map(([field, issues]): TFormiIssuesItem<Issue> | null => {
         if (issues.length === 0) {
           return null;
         }
