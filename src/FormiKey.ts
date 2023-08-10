@@ -8,17 +8,13 @@ export interface IFormiKey {
   readonly id: string;
 }
 
-export const FormiKey = (() => {
-  return create;
-
-  function create(): IFormiKey {
-    const id = nanoid(14);
-    const print = `FormiKey(${id})`;
-    const key: IFormiKey = {
-      [FORMI_KEY]: true,
-      toString: () => print,
-      id,
-    };
-    return key;
-  }
-})();
+export function FormiKey(): IFormiKey {
+  const id = nanoid(14);
+  const print = `FormiKey(${id})`;
+  const key: IFormiKey = {
+    [FORMI_KEY]: true,
+    toString: () => print,
+    id,
+  };
+  return key;
+}

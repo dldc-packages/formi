@@ -5,12 +5,20 @@ import { Path } from './tools/Path';
 
 export type TFormiFieldTree = null | TFormiFieldAny | TFormiFieldTree[] | { [key: string]: TFormiFieldTree };
 
-export type TFormiFieldTreeValue<Tree extends TFormiFieldTree> = Tree extends IFormiField<infer V, any, any>
-  ? V
+export type TFormiFieldTreeOutput<Tree extends TFormiFieldTree> = Tree extends IFormiField<infer Out, any, any, any>
+  ? Out
   : Tree extends Array<infer Inner extends TFormiFieldTree>
-  ? ReadonlyArray<TFormiFieldTreeValue<Inner>>
+  ? ReadonlyArray<TFormiFieldTreeOutput<Inner>>
   : Tree extends { [key: string]: TFormiFieldAny }
-  ? { readonly [K in keyof Tree]: TFormiFieldTreeValue<Tree[K]> }
+  ? { readonly [K in keyof Tree]: TFormiFieldTreeOutput<Tree[K]> }
+  : null;
+
+export type TFormiFieldTreeInput<Tree extends TFormiFieldTree> = Tree extends IFormiField<any, infer In, any, any>
+  ? In
+  : Tree extends Array<infer Inner extends TFormiFieldTree>
+  ? ReadonlyArray<TFormiFieldTreeInput<Inner>>
+  : Tree extends { [key: string]: TFormiFieldAny }
+  ? { readonly [K in keyof Tree]: TFormiFieldTreeInput<Tree[K]> }
   : null;
 
 export const FormiFieldTree = (() => {
@@ -23,6 +31,7 @@ export const FormiFieldTree = (() => {
     getChildren,
     clone,
     restoreFromPaths,
+    restoreFromInput,
   };
 
   /**
@@ -189,6 +198,34 @@ export const FormiFieldTree = (() => {
       Object.entries(tree).map(([key, value]): [string, TFormiFieldTree] => {
         const paths = pathsByKey.get(key) ?? [];
         return [key, restoreFromPaths(value, paths)];
+      }),
+    ) as Tree;
+  }
+
+  /**
+   * Given an input object, restore the tree
+   * For earch field, ingest the value to get the children
+   */
+  function restoreFromInput<Tree extends TFormiFieldTree>(tree: Tree, input: TFormiFieldTreeInput<Tree>): Tree {
+    if (tree === null) {
+      return tree;
+    }
+    if (FormiField.utils.isFormiField(tree)) {
+      const ingested = FormiField.utils.getIngestFn(tree)(input);
+      const restorFromInputFn = FormiField.utils.getRestoreFromInput(tree);
+      return tree.withChildren((prev: TFormiFieldTree) => restoreFromInput(prev, ingested)) as Tree;
+    }
+    if (Array.isArray(tree)) {
+      return tree.map((item, index): TFormiFieldTree => {
+        const ingested = input[index];
+        return restoreFromInput(item, ingested);
+      }) as Tree;
+    }
+    // Object
+    return Object.fromEntries(
+      Object.entries(tree).map(([key, value]): [string, TFormiFieldTree] => {
+        const ingested = input[key];
+        return [key, restoreFromInput(value, ingested)];
       }),
     ) as Tree;
   }

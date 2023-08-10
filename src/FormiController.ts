@@ -7,7 +7,7 @@ import type {
 } from './FormiController.types';
 import { FormiErrors } from './FormiError';
 import type { TFormiFieldAny } from './FormiField.types';
-import type { TFormiFieldTree } from './FormiFieldTree';
+import type { TFormiFieldTree, TFormiFieldTreeInput } from './FormiFieldTree';
 import { FormiFieldTree } from './FormiFieldTree';
 import type { TFormiIssues } from './FormiIssue';
 import { FormiIssuesBuilder } from './FormiIssuesBuilder';
@@ -62,6 +62,7 @@ export const FormiController = (() => {
       subscribe: store.subscribe,
 
       submit,
+      ingest,
       getResult,
       setIssues,
       setOnSubmit,
@@ -128,6 +129,11 @@ export const FormiController = (() => {
       if (onSubmit && actions) {
         onSubmit({ value, formData: data }, actions);
       }
+    }
+
+    function ingest(data: TFormiFieldTreeInput<Tree>): void {
+      const fields = FormiFieldTree.restoreFromInput(store.getTree(), data);
+      store.dispatch({ type: 'Ingest', fields, data });
     }
 
     function handleSubmit(event: SubmitEvent) {

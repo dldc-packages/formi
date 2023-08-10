@@ -31,7 +31,7 @@ export type {
   TFormiFieldChildren,
   TFormiFieldIssue,
   TFormiFieldValue,
-  TInputBase,
+  TOutputBase,
   TRestoreFromPaths,
   TValidate,
   TValidateFailure,
@@ -39,7 +39,12 @@ export type {
   TValidateResult,
   TValidateSuccess,
 } from './FormiField.types';
-export { FormiFieldTree, type TFormiFieldTree, type TFormiFieldTreeValue } from './FormiFieldTree';
+export {
+  FormiFieldTree,
+  type TFormiFieldTree,
+  type TFormiFieldTreeInput,
+  type TFormiFieldTreeOutput,
+} from './FormiFieldTree';
 export type {
   TFormiIssue,
   TFormiIssueBase,

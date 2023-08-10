@@ -6,7 +6,7 @@ import type {
   TFormiFieldChildren,
   TFormiFieldIssue,
   TFormiFieldValue,
-  TInputBase,
+  TOutputBase,
 } from './FormiField.types';
 import type { TFormiFieldTree } from './FormiFieldTree';
 import type { TFormiIssues } from './FormiIssue';
@@ -22,8 +22,8 @@ export interface IFieldState<Value, Issue, Children extends TFormiFieldTree> {
   // This is used to know which fields to update when a field changes
   readonly keys: ReadonlySet<IFormiKey>;
 
-  readonly initialRawValue: TInputBase<Children> | undefined;
-  readonly rawValue: TInputBase<Children> | undefined;
+  readonly initialRawValue: TOutputBase<Children> | undefined;
+  readonly rawValue: TOutputBase<Children> | undefined;
   readonly value: Value | undefined;
   readonly issues: null | Array<Issue>;
   readonly touchedIssues: null | Array<Issue>;
@@ -67,9 +67,10 @@ export type TFormiStoreActions =
       // This action updated the shape of the form
       type: 'SetFields';
       fields: TFormiFieldTree | TFieldsUpdateFn<TFormiFieldTree>;
-    };
+    }
+  | { type: 'Ingest'; fields: TFormiFieldTree; data: any };
 
-export type TRootFormiField = IFormiField<any, any, TFormiFieldTree>;
+export type TRootFormiField = IFormiField<any, any, any, TFormiFieldTree>;
 
 export interface IFormiState {
   // If the root fields is an object of fields we wrap it in a group

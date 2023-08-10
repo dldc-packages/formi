@@ -25,6 +25,7 @@ const IS_IMMU_WEAK_MAP = Symbol('IS_IMMU_WEAK_MAP');
 
 /**
  * An immutable WeakMap.
+ * To update it you need to use the draft method (or the produce method)
  */
 export interface IImmuWeakMap<K extends object, V> {
   readonly [IS_IMMU_WEAK_MAP]: true;

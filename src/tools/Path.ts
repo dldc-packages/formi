@@ -40,6 +40,9 @@ export const PathErrors = {
 
 export type TPathLike = TRawPath | Path;
 
+/**
+ * A Path is a list of keys (string | number)
+ */
 export interface Path {
   readonly [IS_PATH]: true;
   readonly raw: TRawPath;
@@ -57,7 +60,7 @@ export interface Path {
 
 export const Path = (() => {
   return Object.assign(create, {
-    create: create,
+    create,
     isPath,
     validatePathItem,
     serialize,
