@@ -1,4 +1,5 @@
-import { ErreurType } from '@dldc/erreur';
+import type { IKey } from '@dldc/erreur';
+import { Erreur, Key } from '@dldc/erreur';
 
 export type TKey = string | number;
 export type TRawPath = ReadonlyArray<TKey>;
@@ -16,27 +17,38 @@ export interface IInvalidNumberPathItem {
   readonly item: number;
 }
 
-export const PathErrors = {
-  CannotSplitEmpty: ErreurType.defineEmpty('CannotSplitEmpty', (err, provider) => {
-    return err.with(provider).withMessage(`Cannot split head of empty path`);
-  }),
-  InvalidStringPathItem: ErreurType.defineWithTransform(
-    'InvalidStringPathItem',
-    (item: string): IInvalidStringPathItem => ({ item }),
-    (err, provider, data) => {
-      return err.with(provider).withMessage(`String Path item cannot contain . or [ or ] (received "${data.item}")`);
+export const PathErrors = (() => {
+  const CannotSplitEmptyKey: IKey<undefined, false, []> = Key.createEmpty('CannotSplitEmpty');
+  const InvalidStringPathItemKey: IKey<IInvalidStringPathItem, false> = Key.create('InvalidStringPathItem');
+  const InvalidNumberPathItemKey: IKey<IInvalidNumberPathItem, false> = Key.create('InvalidNumberPathItem');
+
+  return {
+    CannotSplitEmpty: {
+      Key: CannotSplitEmptyKey,
+      create() {
+        return Erreur.createWith(CannotSplitEmptyKey)
+          .withName('CannotSplitEmpty')
+          .withMessage(`Cannot split head of empty path`);
+      },
     },
-  ),
-  InvalidNumberPathItem: ErreurType.defineWithTransform(
-    'InvalidNumberPathItem',
-    (item: number): IInvalidNumberPathItem => ({ item }),
-    (err, provider, data) => {
-      return err
-        .with(provider)
-        .withMessage(`Number Path item must be a positive (or 0) integer (received "${data.item}")`);
+    InvalidStringPathItem: {
+      Key: InvalidStringPathItemKey,
+      create(item: string) {
+        return Erreur.createWith(InvalidStringPathItemKey, { item })
+          .withName('InvalidStringPathItem')
+          .withMessage(`String Path item cannot contain . or [ or ] (received "${item}")`);
+      },
     },
-  ),
-};
+    InvalidNumberPathItem: {
+      Key: InvalidNumberPathItemKey,
+      create(item: number) {
+        return Erreur.createWith(InvalidNumberPathItemKey, { item })
+          .withName('InvalidNumberPathItem')
+          .withMessage(`Number Path item must be a positive (or 0) integer (received "${item}")`);
+      },
+    },
+  };
+})();
 
 export type TPathLike = TRawPath | Path;
 

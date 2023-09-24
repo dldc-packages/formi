@@ -1,25 +1,38 @@
-import { ErreurType } from '@dldc/erreur';
+import type { IKey } from '@dldc/erreur';
+import { Erreur, Key } from '@dldc/erreur';
 
 export interface IMissingKeyError {
   key: any;
 }
 
-export const ImmuWeakMapErrors = {
-  MissingKey: ErreurType.defineWithTransform(
-    'MissingKey',
-    (key: any): IMissingKeyError => ({ key }),
-    (err, provider, data) => {
-      return err.with(provider).withMessage(`Unexpected missing key "${data.key}"`);
+export interface ICannotUpdateUnregisteredKeyError {
+  key: any;
+}
+
+export const ImmuWeakMapErrors = (() => {
+  const MissingKey_Key: IKey<IMissingKeyError, false> = Key.create('MissingKey');
+  const CannotUpdateUnregisteredKey_Key: IKey<ICannotUpdateUnregisteredKeyError, false> =
+    Key.create('CannotUpdateUnregisteredKey');
+
+  return {
+    MissingKey: {
+      Key: MissingKey_Key,
+      create(key: any) {
+        return Erreur.createWith(MissingKey_Key, { key })
+          .withName('MissingKey')
+          .withMessage(`Unexpected missing key "${key}"`);
+      },
     },
-  ),
-  CannotUpdateUnregisteredKey: ErreurType.defineWithTransform(
-    'CannotUpdateUnregisteredKey',
-    (key: any): IMissingKeyError => ({ key }),
-    (err, provider, data) => {
-      return err.with(provider).withMessage(`Cannot update unregistered key "${data.key}"`);
+    CannotUpdateUnregisteredKey: {
+      Key: CannotUpdateUnregisteredKey_Key,
+      create(key: any) {
+        return Erreur.createWith(CannotUpdateUnregisteredKey_Key, { key })
+          .withName('CannotUpdateUnregisteredKey')
+          .withMessage(`Cannot update unregistered key "${key}"`);
+      },
     },
-  ),
-};
+  };
+})();
 
 const IS_IMMU_WEAK_MAP = Symbol('IS_IMMU_WEAK_MAP');
 
