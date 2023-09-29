@@ -1,3 +1,0 @@
-{
-  "skipLibCheck": true // zod fails with current TS version
-}
