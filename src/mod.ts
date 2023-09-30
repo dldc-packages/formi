@@ -80,7 +80,7 @@ export {
   PathErrors,
   type IInvalidNumberPathItem,
   type IInvalidStringPathItem,
-  type TKey,
+  type TPathKey as TKey,
   type TPathLike,
   type TRawPath,
 } from './tools/Path';

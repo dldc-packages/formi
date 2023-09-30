@@ -1,4 +1,4 @@
-import type { IKey } from '@dldc/erreur';
+import type { TKey } from '@dldc/erreur';
 import { Erreur, Key } from '@dldc/erreur';
 
 export interface IMissingKeyError {
@@ -10,8 +10,8 @@ export interface ICannotUpdateUnregisteredKeyError {
 }
 
 export const ImmuWeakMapErrors = (() => {
-  const MissingKey_Key: IKey<IMissingKeyError, false> = Key.create('MissingKey');
-  const CannotUpdateUnregisteredKey_Key: IKey<ICannotUpdateUnregisteredKeyError, false> =
+  const MissingKey_Key: TKey<IMissingKeyError> = Key.create('MissingKey');
+  const CannotUpdateUnregisteredKey_Key: TKey<ICannotUpdateUnregisteredKeyError> =
     Key.create('CannotUpdateUnregisteredKey');
 
   return {

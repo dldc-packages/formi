@@ -1,4 +1,4 @@
-import type { IKey } from '@dldc/erreur';
+import type { TKey, TVoidKey } from '@dldc/erreur';
 import { Erreur, Key } from '@dldc/erreur';
 import type { TFormiFieldAny } from './FormiField.types';
 import type { TFormiFieldTree } from './FormiFieldTree';
@@ -20,9 +20,9 @@ export interface IInternal_UnexpectedNever {
 }
 
 export const FormiInternalErrors = (() => {
-  const Internal_UnhandledAction_Key: IKey<IInternal_UnhandledAction, false> = Key.create('Internal_UnhandledAction');
-  const Internal_DuplicateKey_Key: IKey<IInternal_DuplicateKey, false> = Key.create('Internal_DuplicateKey');
-  const Internal_UnexpectedNever_Key: IKey<IInternal_UnexpectedNever, false> = Key.create('Internal_UnexpectedNever');
+  const Internal_UnhandledAction_Key: TKey<IInternal_UnhandledAction> = Key.create('Internal_UnhandledAction');
+  const Internal_DuplicateKey_Key: TKey<IInternal_DuplicateKey> = Key.create('Internal_DuplicateKey');
+  const Internal_UnexpectedNever_Key: TKey<IInternal_UnexpectedNever> = Key.create('Internal_UnexpectedNever');
 
   return {
     Internal_UnhandledAction: {
@@ -85,16 +85,15 @@ export interface IMissingFieldState {
 }
 
 export const FormiErrors = (() => {
-  const MissingFormRefKey: IKey<IMissingFormRef, false> = Key.create('MissingFormRef');
-  const ReusedFieldKey: IKey<IReusedField, false> = Key.create('ReusedField');
-  const FieldNotFoundKey: IKey<IFieldNotFound, false> = Key.create('FieldNotFound');
-  const ValidateSuccessWithoutValueKey: IKey<IValidateSuccessWithoutValue, false> =
-    Key.create('ValidateSuccessWithoutValue');
-  const GetValueUnmountedFormKey: IKey<IGetValueUnmountedForm, false> = Key.create('GetValueUnmountedForm');
-  const GetValueUnresolvedKey: IKey<IGetValueUnresolved, false> = Key.create('GetValueUnresolved');
-  const MissingFieldStateKey: IKey<IMissingFieldState, false> = Key.create('MissingFieldState');
-  const MissingFormiContextKey: IKey<undefined, false, []> = Key.createEmpty('MissingFormiContext');
-  const MissingFormiControllerKey: IKey<undefined, false, []> = Key.createEmpty('MissingFormiController');
+  const MissingFormRefKey: TKey<IMissingFormRef> = Key.create('MissingFormRef');
+  const ReusedFieldKey: TKey<IReusedField> = Key.create('ReusedField');
+  const FieldNotFoundKey: TKey<IFieldNotFound> = Key.create('FieldNotFound');
+  const ValidateSuccessWithoutValueKey: TKey<IValidateSuccessWithoutValue> = Key.create('ValidateSuccessWithoutValue');
+  const GetValueUnmountedFormKey: TKey<IGetValueUnmountedForm> = Key.create('GetValueUnmountedForm');
+  const GetValueUnresolvedKey: TKey<IGetValueUnresolved> = Key.create('GetValueUnresolved');
+  const MissingFieldStateKey: TKey<IMissingFieldState> = Key.create('MissingFieldState');
+  const MissingFormiContextKey: TVoidKey = Key.createEmpty('MissingFormiContext');
+  const MissingFormiControllerKey: TVoidKey = Key.createEmpty('MissingFormiController');
 
   return {
     ...FormiInternalErrors,
