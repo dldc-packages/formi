@@ -1,4 +1,4 @@
-import type { TKey, TVoidKey } from '@dldc/erreur';
+import type { TKey } from '@dldc/erreur';
 import { Erreur, Key } from '@dldc/erreur';
 
 export type TPathKey = string | number;
@@ -9,46 +9,30 @@ const IS_PATH = Symbol('IS_PATH');
 const ALLOWED_CHARS = /[A-Za-z0-9$=_-]+/; // . or [ or ]
 const SPLITTER = /(\[\d+\]|\.)/g;
 
-export interface IInvalidStringPathItem {
-  readonly item: string;
-}
+export type TPathErreurData =
+  | { kind: 'CannotSplitEmpty' }
+  | { kind: 'InvalidStringPathItem'; item: string }
+  | { kind: 'InvalidNumberPathItem'; item: number };
 
-export interface IInvalidNumberPathItem {
-  readonly item: number;
-}
+export const PathErreurKey: TKey<TPathErreurData, false> = Key.create<TPathErreurData>('PathErreur');
 
-export const PathErrors = (() => {
-  const CannotSplitEmptyKey: TVoidKey = Key.createEmpty('CannotSplitEmpty');
-  const InvalidStringPathItemKey: TKey<IInvalidStringPathItem> = Key.create('InvalidStringPathItem');
-  const InvalidNumberPathItemKey: TKey<IInvalidNumberPathItem> = Key.create('InvalidNumberPathItem');
-
-  return {
-    CannotSplitEmpty: {
-      Key: CannotSplitEmptyKey,
-      create() {
-        return Erreur.createWith(CannotSplitEmptyKey)
-          .withName('CannotSplitEmpty')
-          .withMessage(`Cannot split head of empty path`);
-      },
-    },
-    InvalidStringPathItem: {
-      Key: InvalidStringPathItemKey,
-      create(item: string) {
-        return Erreur.createWith(InvalidStringPathItemKey, { item })
-          .withName('InvalidStringPathItem')
-          .withMessage(`String Path item cannot contain . or [ or ] (received "${item}")`);
-      },
-    },
-    InvalidNumberPathItem: {
-      Key: InvalidNumberPathItemKey,
-      create(item: number) {
-        return Erreur.createWith(InvalidNumberPathItemKey, { item })
-          .withName('InvalidNumberPathItem')
-          .withMessage(`Number Path item must be a positive (or 0) integer (received "${item}")`);
-      },
-    },
-  };
-})();
+export const PathErreur = {
+  CannotSplitEmpty: () => {
+    return Erreur.create(new Error(`Cannot split head of empty path`))
+      .with(PathErreurKey.Provider({ kind: 'CannotSplitEmpty' }))
+      .withName('PathErreur');
+  },
+  InvalidStringPathItem: (item: string) => {
+    return Erreur.create(new Error(`String Path item cannot contain . or [ or ] (received "${item}")`))
+      .with(PathErreurKey.Provider({ kind: 'InvalidStringPathItem', item }))
+      .withName('PathErreur');
+  },
+  InvalidNumberPathItem: (item: number) => {
+    return Erreur.create(new Error(`Number Path item must be a positive (or 0) integer (received "${item}")`))
+      .with(PathErreurKey.Provider({ kind: 'InvalidNumberPathItem', item }))
+      .withName('PathErreur');
+  },
+};
 
 export type TPathLike = TRawPath | Path;
 
@@ -129,7 +113,7 @@ export const Path = (() => {
     function splitHeadOrThrow(): [TPathKey, Path] {
       const [head, tail] = splitHead();
       if (head === null) {
-        throw PathErrors.CannotSplitEmpty.create();
+        throw PathErreur.CannotSplitEmpty();
       }
       return [head, tail];
     }
@@ -150,12 +134,12 @@ export const Path = (() => {
       if (Number.isInteger(item) && item >= 0 && item < Number.MAX_SAFE_INTEGER) {
         return item;
       }
-      throw PathErrors.InvalidNumberPathItem.create(item);
+      throw PathErreur.InvalidNumberPathItem(item);
     }
     if (ALLOWED_CHARS.test(item)) {
       return item;
     }
-    throw PathErrors.InvalidStringPathItem.create(item);
+    throw PathErreur.InvalidStringPathItem(item);
   }
 
   /**

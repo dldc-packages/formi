@@ -1,4 +1,4 @@
-import { FormiInternalErrors } from './FormiError';
+import { FormiInternalErreur } from './FormiError';
 
 export const FileOrBlob = globalThis.File || globalThis.Blob;
 
@@ -24,7 +24,7 @@ export function expectNever(val: never, inner?: (val: any) => void): never {
   if (inner) {
     inner(val);
   }
-  throw FormiInternalErrors.Internal_UnexpectedNever.create(val);
+  throw FormiInternalErreur.Internal_UnexpectedNever(val);
 }
 
 export function shallowEqual(left: any, right: any): boolean {

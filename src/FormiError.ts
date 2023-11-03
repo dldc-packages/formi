@@ -1,175 +1,88 @@
-import type { TKey, TVoidKey } from '@dldc/erreur';
+import type { TKey } from '@dldc/erreur';
 import { Erreur, Key } from '@dldc/erreur';
 import type { TFormiFieldAny } from './FormiField.types';
 import type { TFormiFieldTree } from './FormiFieldTree';
 import type { IFormiKey } from './FormiKey';
 import type { Path } from './tools/Path';
 
-export interface IInternal_UnhandledAction {
-  readonly action: any;
-}
+export type TFormiInternalErreurData =
+  | { kind: 'UnhandledAction'; action: any }
+  | { kind: 'DuplicateKey'; key: IFormiKey; current: Path; conflict: Path }
+  | { kind: 'UnexpectedNever'; received: any };
 
-export interface IInternal_DuplicateKey {
-  readonly key: IFormiKey;
-  readonly current: Path;
-  readonly conflict: Path;
-}
+export const FormiInternalErreurKey: TKey<TFormiInternalErreurData, false> =
+  Key.create<TFormiInternalErreurData>('FormiInternalErreur');
 
-export interface IInternal_UnexpectedNever {
-  readonly received: any;
-}
+export const FormiInternalErreur = {
+  Internal_UnhandledAction: (action: any) => {
+    return Erreur.create(new Error(`Unhandled action "${action?.type}"`))
+      .with(FormiInternalErreurKey.Provider({ kind: 'UnhandledAction', action }))
+      .withName('FormiInternalErreur');
+  },
+  Internal_DuplicateKey: (key: IFormiKey, current: Path, conflict: Path) => {
+    return Erreur.create(
+      new Error(`Duplicate key "${key.toString()}" (${current.serialize()} and ${conflict.serialize()})`),
+    )
+      .with(FormiInternalErreurKey.Provider({ kind: 'DuplicateKey', key, current, conflict }))
+      .withName('FormiInternalErreur');
+  },
+  Internal_UnexpectedNever: (received: any) => {
+    return Erreur.create(new Error(`Unexpected Never (received ${received})`))
+      .with(FormiInternalErreurKey.Provider({ kind: 'UnexpectedNever', received }))
+      .withName('FormiInternalErreur');
+  },
+};
 
-export const FormiInternalErrors = (() => {
-  const Internal_UnhandledAction_Key: TKey<IInternal_UnhandledAction> = Key.create('Internal_UnhandledAction');
-  const Internal_DuplicateKey_Key: TKey<IInternal_DuplicateKey> = Key.create('Internal_DuplicateKey');
-  const Internal_UnexpectedNever_Key: TKey<IInternal_UnexpectedNever> = Key.create('Internal_UnexpectedNever');
+export type TFormiErreurData =
+  | { kind: 'MissingFormRef'; formName: string }
+  | { kind: 'ReusedField'; tree: TFormiFieldTree; field: TFormiFieldAny; paths: Array<Path> }
+  | { kind: 'FieldNotFound'; tree: TFormiFieldTree; field: TFormiFieldAny }
+  | { kind: 'ValidateSuccessWithoutValue'; field: TFormiFieldAny; input: any }
+  | { kind: 'GetValueUnmountedForm'; formName: string }
+  | { kind: 'GetValueUnresolved'; formName: string }
+  | { kind: 'MissingFieldState'; field: TFormiFieldAny };
 
-  return {
-    Internal_UnhandledAction: {
-      Key: Internal_UnhandledAction_Key,
-      create(action: any) {
-        return Erreur.createWith(Internal_UnhandledAction_Key, { action })
-          .withName('Internal_UnhandledAction')
-          .withMessage(`Unhandled action "${action?.type}"`);
-      },
-    },
-    Internal_DuplicateKey: {
-      Key: Internal_DuplicateKey_Key,
-      create(key: IFormiKey, current: Path, conflict: Path) {
-        return Erreur.createWith(Internal_DuplicateKey_Key, { key, current, conflict })
-          .withName('Internal_DuplicateKey')
-          .withMessage(`Duplicate key "${key.toString()}" (${current.serialize()} and ${conflict.serialize()})`);
-      },
-    },
-    Internal_UnexpectedNever: {
-      Key: Internal_UnexpectedNever_Key,
-      create(received: any) {
-        return Erreur.createWith(Internal_UnexpectedNever_Key, { received })
-          .withName('Internal_UnexpectedNever')
-          .withMessage(`Unexpected Never (received ${received})`);
-      },
-    },
-  };
-})();
+export const FormiErreurKey: TKey<TFormiErreurData, false> = Key.create<TFormiErreurData>('FormiErreur');
 
-export interface IMissingFormRef {
-  formName: string;
-}
-
-export interface IReusedField {
-  tree: TFormiFieldTree;
-  field: TFormiFieldAny;
-  paths: Array<Path>;
-}
-
-export interface IFieldNotFound {
-  tree: TFormiFieldTree;
-  field: TFormiFieldAny;
-}
-
-export interface IValidateSuccessWithoutValue {
-  field: TFormiFieldAny;
-  input: any;
-}
-
-export interface IGetValueUnmountedForm {
-  formName: string;
-}
-
-export interface IGetValueUnresolved {
-  formName: string;
-}
-
-export interface IMissingFieldState {
-  field: TFormiFieldAny;
-}
-
-export const FormiErrors = (() => {
-  const MissingFormRefKey: TKey<IMissingFormRef> = Key.create('MissingFormRef');
-  const ReusedFieldKey: TKey<IReusedField> = Key.create('ReusedField');
-  const FieldNotFoundKey: TKey<IFieldNotFound> = Key.create('FieldNotFound');
-  const ValidateSuccessWithoutValueKey: TKey<IValidateSuccessWithoutValue> = Key.create('ValidateSuccessWithoutValue');
-  const GetValueUnmountedFormKey: TKey<IGetValueUnmountedForm> = Key.create('GetValueUnmountedForm');
-  const GetValueUnresolvedKey: TKey<IGetValueUnresolved> = Key.create('GetValueUnresolved');
-  const MissingFieldStateKey: TKey<IMissingFieldState> = Key.create('MissingFieldState');
-  const MissingFormiContextKey: TVoidKey = Key.createEmpty('MissingFormiContext');
-  const MissingFormiControllerKey: TVoidKey = Key.createEmpty('MissingFormiController');
-
-  return {
-    ...FormiInternalErrors,
-    MissingFormRef: {
-      Key: MissingFormRefKey,
-      create(formName: string) {
-        return Erreur.createWith(MissingFormRefKey, { formName })
-          .withName('MissingFormRef')
-          .withMessage(`Missing form ref on form "${formName}"`);
-      },
-    },
-    ReusedField: {
-      Key: ReusedFieldKey,
-      create(tree: TFormiFieldTree, field: TFormiFieldAny, paths: Array<Path>) {
-        return Erreur.createWith(ReusedFieldKey, { tree, field, paths })
-          .withName('ReusedField')
-          .withMessage(
-            `Field "${field.key.toString()}" is used multiple times (${paths.map((p) => p.toString()).join(', ')})`,
-          );
-      },
-    },
-    FieldNotFound: {
-      Key: FieldNotFoundKey,
-      create(tree: TFormiFieldTree, field: TFormiFieldAny) {
-        return Erreur.createWith(FieldNotFoundKey, { tree, field })
-          .withName('FieldNotFound')
-          .withMessage(`Field "${field.key.toString()}" not found in tree.`);
-      },
-    },
-    ValidateSuccessWithoutValue: {
-      Key: ValidateSuccessWithoutValueKey,
-      create(field: TFormiFieldAny, input: any) {
-        return Erreur.createWith(ValidateSuccessWithoutValueKey, { field, input })
-          .withName('ValidateSuccessWithoutValue')
-          .withMessage(`Expected a value to be returned from the validation function (got undefined).`);
-      },
-    },
-    GetValueUnmountedForm: {
-      Key: GetValueUnmountedFormKey,
-      create(formName: string) {
-        return Erreur.createWith(GetValueUnmountedFormKey, { formName })
-          .withName('GetValueUnmountedForm')
-          .withMessage(`Cannot get value of unmounted form "${formName}"`);
-      },
-    },
-    GetValueUnresolved: {
-      Key: GetValueUnresolvedKey,
-      create(formName: string) {
-        return Erreur.createWith(GetValueUnresolvedKey, { formName })
-          .withName('GetValueUnresolved')
-          .withMessage(`Cannot get value of unresolved form "${formName}"`);
-      },
-    },
-    MissingFieldState: {
-      Key: MissingFieldStateKey,
-      create(field: TFormiFieldAny) {
-        return Erreur.createWith(MissingFieldStateKey, { field })
-          .withName('MissingFieldState')
-          .withMessage(`Missing field state for field "${field.key.toString()}"`);
-      },
-    },
-    MissingFormiContext: {
-      Key: MissingFormiContextKey,
-      create() {
-        return Erreur.createWith(MissingFormiContextKey)
-          .withName('MissingFormiContext')
-          .withMessage(`No FormiContext found`);
-      },
-    },
-    MissingFormiController: {
-      Key: MissingFormiControllerKey,
-      create() {
-        return Erreur.createWith(MissingFormiControllerKey)
-          .withName('MissingFormiController')
-          .withMessage(`No FormiController found`);
-      },
-    },
-  };
-})();
+export const FormiErreur = {
+  ...FormiInternalErreur,
+  MissingFormRef: (formName: string) => {
+    return Erreur.create(new Error(`Missing form ref on form "${formName}"`))
+      .with(FormiErreurKey.Provider({ kind: 'MissingFormRef', formName }))
+      .withName('FormiErreur');
+  },
+  ReusedField: (tree: TFormiFieldTree, field: TFormiFieldAny, paths: Array<Path>) => {
+    return Erreur.create(
+      new Error(
+        `Field "${field.key.toString()}" is used multiple times (${paths.map((p) => p.toString()).join(', ')})`,
+      ),
+    )
+      .with(FormiErreurKey.Provider({ kind: 'ReusedField', tree, field, paths }))
+      .withName('FormiErreur');
+  },
+  FieldNotFound: (tree: TFormiFieldTree, field: TFormiFieldAny) => {
+    return Erreur.create(new Error(`Field "${field.key.toString()}" not found in tree.`))
+      .with(FormiErreurKey.Provider({ kind: 'FieldNotFound', tree, field }))
+      .withName('FormiErreur');
+  },
+  ValidateSuccessWithoutValue: (field: TFormiFieldAny, input: any) => {
+    return Erreur.create(new Error(`Expected a value to be returned from the validation function (got undefined).`))
+      .with(FormiErreurKey.Provider({ kind: 'ValidateSuccessWithoutValue', field, input }))
+      .withName('FormiErreur');
+  },
+  GetValueUnmountedForm: (formName: string) => {
+    return Erreur.create(new Error(`Cannot get value of unmounted form "${formName}"`))
+      .with(FormiErreurKey.Provider({ kind: 'GetValueUnmountedForm', formName }))
+      .withName('FormiErreur');
+  },
+  GetValueUnresolved: (formName: string) => {
+    return Erreur.create(new Error(`Cannot get value of unresolved form "${formName}"`))
+      .with(FormiErreurKey.Provider({ kind: 'GetValueUnresolved', formName }))
+      .withName('FormiErreur');
+  },
+  MissingFieldState: (field: TFormiFieldAny) => {
+    return Erreur.create(new Error(`Missing field state for field "${field.key.toString()}"`))
+      .with(FormiErreurKey.Provider({ kind: 'MissingFieldState', field }))
+      .withName('FormiErreur');
+  },
+};

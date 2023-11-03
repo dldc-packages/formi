@@ -1,4 +1,4 @@
-import { FormiErrors } from './FormiError';
+import { FormiErreur } from './FormiError';
 import { FormiField } from './FormiField';
 import type { IFormiField, TFormiFieldAny } from './FormiField.types';
 import { Path } from './tools/Path';
@@ -79,7 +79,7 @@ export const FormiFieldTree = (() => {
       return null;
     }
     if (found.length > 1) {
-      throw FormiErrors.ReusedField.create(tree, field, found);
+      throw FormiErreur.ReusedField(tree, field, found);
     }
     return found[0];
   }

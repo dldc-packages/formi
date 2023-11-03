@@ -8,20 +8,8 @@ export type {
   TFormiResult,
   TOnSubmit,
 } from './FormiController.types';
-export {
-  FormiErrors,
-  FormiInternalErrors,
-  type IFieldNotFound,
-  type IGetValueUnmountedForm,
-  type IGetValueUnresolved,
-  type IInternal_DuplicateKey,
-  type IInternal_UnexpectedNever,
-  type IInternal_UnhandledAction,
-  type IMissingFieldState,
-  type IMissingFormRef,
-  type IReusedField,
-  type IValidateSuccessWithoutValue,
-} from './FormiError';
+export { FormiErreur, FormiErreurKey, FormiInternalErreur, FormiInternalErreurKey } from './FormiError';
+export type { TFormiErreurData, TFormiInternalErreurData } from './FormiError';
 export { FormiField, failure, success } from './FormiField';
 export type {
   ICreateFieldOptions,
@@ -70,17 +58,18 @@ export type {
 export {
   ImmuWeakMap,
   ImmuWeakMapDraft,
-  ImmuWeakMapErrors,
+  ImmuWeakMapErreur,
+  ImmuWeakMapErreurKey,
   type IImmuWeakMap,
   type IImmuWeakMapDraft,
-  type IMissingKeyError,
+  type TImmuWeakMapErreurData,
 } from './tools/ImmuWeakMap';
 export {
   Path,
-  PathErrors,
-  type IInvalidNumberPathItem,
-  type IInvalidStringPathItem,
-  type TPathKey as TKey,
+  PathErreur,
+  PathErreurKey,
+  type TPathErreurData,
+  type TPathKey,
   type TPathLike,
   type TRawPath,
 } from './tools/Path';

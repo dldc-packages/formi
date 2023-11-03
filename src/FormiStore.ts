@@ -1,5 +1,5 @@
-import { Suub } from '@dldc/pubsub';
-import { FormiErrors, FormiInternalErrors } from './FormiError';
+import { PubSub } from '@dldc/pubsub';
+import { FormiErreur } from './FormiError';
 import { FormiField } from './FormiField';
 import type { TFormiFieldAny, TInputBase } from './FormiField.types';
 import { FormiFieldTree, type TFormiFieldTree } from './FormiFieldTree';
@@ -28,7 +28,7 @@ export const FormiStore = (() => {
     issues: TFormiIssues<any> | undefined,
   ): IFormiStore {
     let state: IFormiState = createInitialState(formName, initialFields, issues);
-    const subscription = Suub.createSubscription<IFormiState>();
+    const subscription = PubSub.createSubscription<IFormiState>();
 
     return {
       subscribe: subscription.subscribe,
@@ -221,7 +221,7 @@ export const FormiStore = (() => {
         };
       }
       return expectNever(action, (action) => {
-        throw FormiInternalErrors.Internal_UnhandledAction.create(action);
+        throw FormiErreur.Internal_UnhandledAction(action);
       });
     }
 
@@ -325,7 +325,7 @@ export const FormiStore = (() => {
           item.keys.forEach((key) => {
             const current = keysMap.get(key);
             if (current) {
-              throw FormiInternalErrors.Internal_DuplicateKey.create(key, current, item.path);
+              throw FormiErreur.Internal_DuplicateKey(key, current, item.path);
             }
             keysMap.set(key, item.path);
           });
@@ -351,7 +351,7 @@ export const FormiStore = (() => {
         const result = validateFn(input.input as any);
         if (result.success) {
           if (result.value === undefined) {
-            throw FormiErrors.ValidateSuccessWithoutValue.create(field, input.input);
+            throw FormiErreur.ValidateSuccessWithoutValue(field, input.input);
           }
           return { status: 'success', value: result.value };
         }
@@ -497,10 +497,10 @@ export const FormiStore = (() => {
       const { states, rootField } = getState();
       const rootState = states.getOrThrow(rootField.key);
       if (rootState.isMounted === false) {
-        throw FormiErrors.GetValueUnmountedForm.create(formName);
+        throw FormiErreur.GetValueUnmountedForm(formName);
       }
       if (rootState.value === undefined) {
-        throw FormiErrors.GetValueUnresolved.create(formName);
+        throw FormiErreur.GetValueUnresolved(formName);
       }
       return rootState.value;
     }
