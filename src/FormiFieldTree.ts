@@ -8,10 +8,10 @@ export type TFormiFieldTree = null | TFormiFieldAny | TFormiFieldTree[] | { [key
 export type TFormiFieldTreeValue<Tree extends TFormiFieldTree> = Tree extends IFormiField<infer V, any, any>
   ? V
   : Tree extends Array<infer Inner extends TFormiFieldTree>
-  ? ReadonlyArray<TFormiFieldTreeValue<Inner>>
-  : Tree extends { [key: string]: TFormiFieldAny }
-  ? { readonly [K in keyof Tree]: TFormiFieldTreeValue<Tree[K]> }
-  : null;
+    ? ReadonlyArray<TFormiFieldTreeValue<Inner>>
+    : Tree extends { [key: string]: TFormiFieldAny }
+      ? { readonly [K in keyof Tree]: TFormiFieldTreeValue<Tree[K]> }
+      : null;
 
 export const FormiFieldTree = (() => {
   return {
