@@ -189,14 +189,12 @@ export const FormiController = (() => {
         }
         unmount();
       }
-      if (formEl === null) {
-        formEl = newFormEl;
-        formEl.addEventListener('submit', handleSubmit);
-        formEl.addEventListener('change', handleChange);
-        formEl.addEventListener('reset', handleReset);
-      }
-      const data = new FormData(formEl);
+      formEl = newFormEl;
+      formEl.addEventListener('submit', handleSubmit);
+      formEl.addEventListener('change', handleChange);
+      formEl.addEventListener('reset', handleReset);
       if (validateOnMount) {
+        const data = new FormData(formEl);
         store.dispatch({ type: 'Mount', data });
       }
     }
