@@ -183,7 +183,10 @@ export const FormiController = (() => {
     }
 
     function mount(newFormEl: HTMLFormElement) {
-      if (formEl && formEl !== newFormEl) {
+      if (formEl) {
+        if (formEl === newFormEl) {
+          return;
+        }
         unmount();
       }
       if (formEl === null) {
@@ -202,6 +205,8 @@ export const FormiController = (() => {
       if (formEl) {
         formEl.removeEventListener('submit', handleSubmit);
         formEl.removeEventListener('change', handleChange);
+        formEl.removeEventListener('reset', handleReset);
+        formEl = null;
       }
     }
   }
