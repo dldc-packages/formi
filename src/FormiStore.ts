@@ -1,4 +1,4 @@
-import { PubSub } from '@dldc/pubsub';
+import { createSubscription } from '@dldc/pubsub';
 import { FormiErreur } from './FormiError';
 import { FormiField } from './FormiField';
 import type { TFormiFieldAny, TInputBase } from './FormiField.types';
@@ -28,7 +28,7 @@ export const FormiStore = (() => {
     issues: TFormiIssues<any> | undefined,
   ): IFormiStore {
     let state: IFormiState = createInitialState(formName, initialFields, issues);
-    const subscription = PubSub.createSubscription<IFormiState>();
+    const subscription = createSubscription<IFormiState>();
 
     return {
       subscribe: subscription.subscribe,
