@@ -1,25 +1,26 @@
-import type { TKey } from '@dldc/erreur';
-import { Erreur, Key } from '@dldc/erreur';
+import { createErreurStore } from '@dldc/erreur';
 
 export type TImmuWeakMapErreurData =
   | { kind: 'MissingKey'; key: any }
   | { kind: 'CannotUpdateUnregisteredKey'; key: any };
 
-export const ImmuWeakMapErreurKey: TKey<TImmuWeakMapErreurData, false> =
-  Key.create<TImmuWeakMapErreurData>('ImmuWeakMapErreur');
+const ImmuWeakMapErreurInternal = createErreurStore<TImmuWeakMapErreurData>();
 
-export const ImmuWeakMapErreur = {
-  MissingKey: (key: any) => {
-    return Erreur.create(new Error(`Unexpected missing key "${key}"`))
-      .with(ImmuWeakMapErreurKey.Provider({ kind: 'MissingKey', key }))
-      .withName('ImmuWeakMapErreur');
-  },
-  CannotUpdateUnregisteredKey: (key: any) => {
-    return Erreur.create(new Error(`Cannot update unregistered key "${key}"`))
-      .with(ImmuWeakMapErreurKey.Provider({ kind: 'CannotUpdateUnregisteredKey', key }))
-      .withName('ImmuWeakMapErreur');
-  },
-};
+export const ImmuWeakMapErreur = ImmuWeakMapErreurInternal.asReadonly;
+
+export function createMissingKey(key: any) {
+  return ImmuWeakMapErreurInternal.setAndReturn(`Unexpected missing key "${key}"`, {
+    kind: 'MissingKey',
+    key,
+  });
+}
+
+export function createCannotUpdateUnregisteredKey(key: any) {
+  return ImmuWeakMapErreurInternal.setAndReturn(`Cannot update unregistered key "${key}"`, {
+    kind: 'CannotUpdateUnregisteredKey',
+    key,
+  });
+}
 
 const IS_IMMU_WEAK_MAP = Symbol('IS_IMMU_WEAK_MAP');
 
@@ -61,7 +62,7 @@ export const ImmuWeakMap = (() => {
 
     function getOrThrow(key: K): V {
       if (has(key) === false) {
-        throw ImmuWeakMapErreur.MissingKey(key);
+        throw createMissingKey(key);
       }
       return get(key) as any;
     }
@@ -138,7 +139,7 @@ export const ImmuWeakMapDraft = (() => {
     function updateOrThrow(key: K, updater: (prev: V) => V): void {
       const prevVal = get(key);
       if (prevVal === undefined) {
-        throw ImmuWeakMapErreur.CannotUpdateUnregisteredKey(key);
+        throw createCannotUpdateUnregisteredKey(key);
       }
       const nextVal = updater(prevVal);
       set(key, nextVal);
@@ -156,7 +157,7 @@ export const ImmuWeakMapDraft = (() => {
 
     function getOrThrow(key: K): V {
       if (has(key) === false) {
-        throw ImmuWeakMapErreur.MissingKey(key);
+        throw createMissingKey(key);
       }
       return get(key) as any;
     }

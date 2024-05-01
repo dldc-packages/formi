@@ -1,5 +1,4 @@
-import type { TKey } from '@dldc/erreur';
-import { Erreur, Key } from '@dldc/erreur';
+import { createErreurStore } from '@dldc/erreur';
 
 export type TPathKey = string | number;
 export type TRawPath = ReadonlyArray<TPathKey>;
@@ -14,25 +13,29 @@ export type TPathErreurData =
   | { kind: 'InvalidStringPathItem'; item: string }
   | { kind: 'InvalidNumberPathItem'; item: number };
 
-export const PathErreurKey: TKey<TPathErreurData, false> = Key.create<TPathErreurData>('PathErreur');
+const PathErreurInternal = createErreurStore<TPathErreurData>();
 
-export const PathErreur = {
-  CannotSplitEmpty: () => {
-    return Erreur.create(new Error(`Cannot split head of empty path`))
-      .with(PathErreurKey.Provider({ kind: 'CannotSplitEmpty' }))
-      .withName('PathErreur');
-  },
-  InvalidStringPathItem: (item: string) => {
-    return Erreur.create(new Error(`String Path item cannot contain . or [ or ] (received "${item}")`))
-      .with(PathErreurKey.Provider({ kind: 'InvalidStringPathItem', item }))
-      .withName('PathErreur');
-  },
-  InvalidNumberPathItem: (item: number) => {
-    return Erreur.create(new Error(`Number Path item must be a positive (or 0) integer (received "${item}")`))
-      .with(PathErreurKey.Provider({ kind: 'InvalidNumberPathItem', item }))
-      .withName('PathErreur');
-  },
-};
+export const PathErreur = PathErreurInternal.asReadonly;
+
+function createCannotSplitEmpty() {
+  return PathErreurInternal.setAndReturn(`Cannot split head of empty path`, {
+    kind: 'CannotSplitEmpty',
+  });
+}
+
+function createInvalidStringPathItem(item: string) {
+  return PathErreurInternal.setAndReturn(`String Path item cannot contain . or [ or ] (received "${item}")`, {
+    kind: 'InvalidStringPathItem',
+    item,
+  });
+}
+
+function createInvalidNumberPathItem(item: number) {
+  return PathErreurInternal.setAndReturn(`Number Path item must be a positive (or 0) integer (received "${item}")`, {
+    kind: 'InvalidNumberPathItem',
+    item,
+  });
+}
 
 export type TPathLike = TRawPath | Path;
 
@@ -113,7 +116,7 @@ export const Path = (() => {
     function splitHeadOrThrow(): [TPathKey, Path] {
       const [head, tail] = splitHead();
       if (head === null) {
-        throw PathErreur.CannotSplitEmpty();
+        throw createCannotSplitEmpty();
       }
       return [head, tail];
     }
@@ -134,12 +137,12 @@ export const Path = (() => {
       if (Number.isInteger(item) && item >= 0 && item < Number.MAX_SAFE_INTEGER) {
         return item;
       }
-      throw PathErreur.InvalidNumberPathItem(item);
+      throw createInvalidNumberPathItem(item);
     }
     if (ALLOWED_CHARS.test(item)) {
       return item;
     }
-    throw PathErreur.InvalidStringPathItem(item);
+    throw createInvalidStringPathItem(item);
   }
 
   /**

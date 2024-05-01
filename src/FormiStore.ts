@@ -1,5 +1,11 @@
 import { createSubscription } from '@dldc/pubsub';
-import { FormiErreur } from './FormiError';
+import {
+  createGetValueUnmountedForm,
+  createGetValueUnresolved,
+  createInternalDuplicateKey,
+  createInternalUnhandledAction,
+  createValidateSuccessWithoutValue,
+} from './FormiErreur';
 import { FormiField } from './FormiField';
 import type { TFormiFieldAny, TInputBase } from './FormiField.types';
 import { FormiFieldTree, type TFormiFieldTree } from './FormiFieldTree';
@@ -221,7 +227,7 @@ export const FormiStore = (() => {
         };
       }
       return expectNever(action, (action) => {
-        throw FormiErreur.Internal_UnhandledAction(action);
+        throw createInternalUnhandledAction(action);
       });
     }
 
@@ -325,7 +331,7 @@ export const FormiStore = (() => {
           item.keys.forEach((key) => {
             const current = keysMap.get(key);
             if (current) {
-              throw FormiErreur.Internal_DuplicateKey(key, current, item.path);
+              throw createInternalDuplicateKey(key, current, item.path);
             }
             keysMap.set(key, item.path);
           });
@@ -351,7 +357,7 @@ export const FormiStore = (() => {
         const result = validateFn(input.input as any);
         if (result.success) {
           if (result.value === undefined) {
-            throw FormiErreur.ValidateSuccessWithoutValue(field, input.input);
+            throw createValidateSuccessWithoutValue(field, input.input);
           }
           return { status: 'success', value: result.value };
         }
@@ -497,10 +503,10 @@ export const FormiStore = (() => {
       const { states, rootField } = getState();
       const rootState = states.getOrThrow(rootField.key);
       if (rootState.isMounted === false) {
-        throw FormiErreur.GetValueUnmountedForm(formName);
+        throw createGetValueUnmountedForm(formName);
       }
       if (rootState.value === undefined) {
-        throw FormiErreur.GetValueUnresolved(formName);
+        throw createGetValueUnresolved(formName);
       }
       return rootState.value;
     }

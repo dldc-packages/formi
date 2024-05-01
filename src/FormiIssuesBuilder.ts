@@ -1,4 +1,4 @@
-import { FormiErreur } from './FormiError';
+import { createFieldNotFound } from './FormiErreur';
 import type { TFormiFieldAny, TFormiFieldIssue } from './FormiField.types';
 import type { TFormiFieldTree } from './FormiFieldTree';
 import { FormiFieldTree } from './FormiFieldTree';
@@ -47,7 +47,7 @@ export const FormiIssuesBuilder = (() => {
         }
         const path = FormiFieldTree.fieldPath(tree, field);
         if (path === null) {
-          throw FormiErreur.FieldNotFound(tree, field);
+          throw createFieldNotFound(tree, field);
         }
         return {
           path: path.raw,

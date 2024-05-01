@@ -8,8 +8,7 @@ export type {
   TFormiResult,
   TOnSubmit,
 } from './FormiController.types';
-export { FormiErreur, FormiErreurKey, FormiInternalErreur, FormiInternalErreurKey } from './FormiError';
-export type { TFormiErreurData, TFormiInternalErreurData } from './FormiError';
+export { FormiErreur, type TFormiErreurData } from './FormiErreur';
 export { FormiField, failure, success } from './FormiField';
 export type {
   ICreateFieldOptions,
@@ -59,17 +58,8 @@ export {
   ImmuWeakMap,
   ImmuWeakMapDraft,
   ImmuWeakMapErreur,
-  ImmuWeakMapErreurKey,
   type IImmuWeakMap,
   type IImmuWeakMapDraft,
   type TImmuWeakMapErreurData,
 } from './tools/ImmuWeakMap';
-export {
-  Path,
-  PathErreur,
-  PathErreurKey,
-  type TPathErreurData,
-  type TPathKey,
-  type TPathLike,
-  type TRawPath,
-} from './tools/Path';
+export { Path, PathErreur, type TPathErreurData, type TPathKey, type TPathLike, type TRawPath } from './tools/Path';

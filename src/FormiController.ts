@@ -5,7 +5,7 @@ import type {
   TFormiResult,
   TOnSubmit,
 } from './FormiController.types';
-import { FormiErreur } from './FormiError';
+import { createMissingFormRef } from './FormiErreur';
 import type { TFormiFieldAny } from './FormiField.types';
 import type { TFormiFieldTree } from './FormiFieldTree';
 import { FormiFieldTree } from './FormiFieldTree';
@@ -109,7 +109,7 @@ export const FormiController = (() => {
 
     function getForm() {
       if (!formEl) {
-        throw FormiErreur.MissingFormRef(formName);
+        throw createMissingFormRef(formName);
       }
       return formEl;
     }
