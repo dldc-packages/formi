@@ -8,7 +8,17 @@ export type {
   TFormiResult,
   TOnSubmit,
 } from './FormiController.types';
-export { FormiErreur, type TFormiErreurData } from './FormiErreur';
+export {
+  FormiErreur,
+  createFieldNotFound,
+  createGetValueUnmountedForm,
+  createGetValueUnresolved,
+  createMissingFieldState,
+  createMissingFormRef,
+  createReusedField,
+  createValidateSuccessWithoutValue,
+  type TFormiErreurData,
+} from './FormiErreur';
 export { FormiField, failure, success } from './FormiField';
 export type {
   ICreateFieldOptions,
