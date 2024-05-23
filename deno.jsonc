@@ -1,6 +1,6 @@
 {
   "name": "@dldc/formi",
-  "version": "3.0.1",
+  "version": "4.0.0",
   "exports": "./mod.ts",
   "imports": {
     "@dldc/erreur": "jsr:@dldc/erreur@^7.1.1",
@@ -22,6 +22,10 @@
     "check": "deno fmt --check . && deno lint . && deno task test"
   },
   "lint": {
-    "rules": { "exclude": ["no-explicit-any"] }
+    "rules": {
+      "exclude": [
+        "no-explicit-any"
+      ]
+    }
   }
 }
