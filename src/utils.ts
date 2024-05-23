@@ -1,15 +1,16 @@
-import { createInternalUnexpectedNever } from './FormiErreur';
+import { createInternalUnexpectedNever } from "./FormiErreur.ts";
 
 export const FileOrBlob = globalThis.File || globalThis.Blob;
 
 export const nanoid = (() => {
   // https://github.com/ai/nanoid/blob/main/non-secure/index.js
-  const urlAlphabet = 'useandom-26T198340PX75pxJACKVERYMINDBUSHWOLF_GQZbfghjklqvwyzrict';
+  const urlAlphabet =
+    "useandom-26T198340PX75pxJACKVERYMINDBUSHWOLF_GQZbfghjklqvwyzrict";
 
   return nanoid;
 
   function nanoid(size = 21) {
-    let id = '';
+    let id = "";
     // A compact alternative for `for (var i = 0; i < step; i++)`.
     let i = size;
     while (i--) {
@@ -35,7 +36,10 @@ export function shallowEqual(left: any, right: any): boolean {
   if (left === right) {
     return true;
   }
-  if (left === undefined || right === undefined || left === null || right === null || typeof left !== typeof right) {
+  if (
+    left === undefined || right === undefined || left === null ||
+    right === null || typeof left !== typeof right
+  ) {
     return false;
   }
   if (Array.isArray(left) && Array.isArray(right)) {
@@ -62,7 +66,10 @@ export function shallowEqual(left: any, right: any): boolean {
   return true;
 }
 
-export function isSetEqual<T>(left: ReadonlySet<T>, right: ReadonlySet<T>): boolean {
+export function isSetEqual<T>(
+  left: ReadonlySet<T>,
+  right: ReadonlySet<T>,
+): boolean {
   if (left.size !== right.size) {
     return false;
   }

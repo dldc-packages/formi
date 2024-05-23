@@ -1,13 +1,17 @@
-import { expect, test } from 'vitest';
-import { ImmuWeakMap } from '../../src/mod';
+import { expect } from "@std/expect";
+import {
+  createEmptyImmuWeakMap,
+  createImmuWeakMap,
+  isImmuWeakMap,
+} from "../../src/tools/ImmuWeakMap.ts";
 
-test('Create ImmuWeakMap', () => {
-  const map = ImmuWeakMap(new WeakMap());
+Deno.test("Create ImmuWeakMap", () => {
+  const map = createImmuWeakMap(new WeakMap());
   expect(map).toBeDefined();
-  expect(ImmuWeakMap.isImmuWeakMap(map)).toBe(true);
+  expect(isImmuWeakMap(map)).toBe(true);
 });
 
-test('Mutate with draft', () => {
+Deno.test("Mutate with draft", () => {
   type Key = Record<never, any>;
   type Val = number;
 
@@ -16,7 +20,7 @@ test('Mutate with draft', () => {
   const k3: Key = {};
   const k4: Key = {};
 
-  const v1 = ImmuWeakMap.empty<Key, Val>();
+  const v1 = createEmptyImmuWeakMap<Key, Val>();
 
   const v2 = v1.produce((draft) => {
     expect(draft.get(k1)).toBe(undefined);

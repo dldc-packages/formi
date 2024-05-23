@@ -1,10 +1,13 @@
-import type { SubscribeMethod } from '@dldc/pubsub';
-import type { IS_FORM_CONTROLLER } from './FormiController';
-import type { TFormiFieldAny } from './FormiField.types';
-import type { TFormiFieldTree, TFormiFieldTreeValue } from './FormiFieldTree';
-import type { TFormiIssues } from './FormiIssue';
-import type { IFormiIssuesBuilder } from './FormiIssuesBuilder';
-import type { IFormiState } from './FormiStore.types';
+import type { SubscribeMethod } from "@dldc/pubsub";
+import type { IS_FORM_CONTROLLER } from "./FormiController.ts";
+import type { TFormiFieldAny } from "./FormiField.types.ts";
+import type {
+  TFormiFieldTree,
+  TFormiFieldTreeValue,
+} from "./FormiFieldTree.ts";
+import type { TFormiIssues } from "./FormiIssue.ts";
+import type { IFormiIssuesBuilder } from "./FormiIssuesBuilder.ts";
+import type { IFormiState } from "./FormiStore.types.ts";
 
 export interface IOnSubmitActions {
   preventDefault: () => void;
@@ -19,17 +22,17 @@ export type TOnSubmit<Tree extends TFormiFieldTree> = (
 
 export type TFormiResult<Tree extends TFormiFieldTree> =
   | {
-      success: true;
-      value: TFormiFieldTreeValue<Tree>;
-      fields: Tree;
-      customIssues: IFormiIssuesBuilder<unknown>;
-    }
+    success: true;
+    value: TFormiFieldTreeValue<Tree>;
+    fields: Tree;
+    customIssues: IFormiIssuesBuilder<unknown>;
+  }
   | {
-      success: false;
-      issues: TFormiIssues<unknown>;
-      fields: Tree;
-      customIssues: IFormiIssuesBuilder<unknown>;
-    };
+    success: false;
+    issues: TFormiIssues<unknown>;
+    fields: Tree;
+    customIssues: IFormiIssuesBuilder<unknown>;
+  };
 
 export type TFieldsUpdateFn<F extends TFormiFieldTree> = (fields: F) => F;
 
