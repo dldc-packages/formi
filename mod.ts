@@ -1,7 +1,7 @@
 export * from "./src/FormiController.ts";
 export * from "./src/FormiController.types.ts";
 export * from "./src/FormiErreur.ts";
-export * from "./src/FormiField.ts";
+export * as FormiField from "./src/FormiField.ts";
 export * from "./src/FormiField.types.ts";
 export * from "./src/FormiFieldTree.ts";
 export * from "./src/FormiIssue.ts";

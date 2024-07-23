@@ -1,0 +1,3 @@
+export const FIELD_TYPES = Symbol("FIELD_TYPES");
+export const FIELD_VALIDATE_FN = Symbol("FIELD_VALIDATE_FN");
+export const FIELD_RESTORE_FROM_PATHS = Symbol("FIELD_RESTORE_FROM_PATHS");

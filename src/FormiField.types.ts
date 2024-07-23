@@ -2,7 +2,7 @@ import type {
   FIELD_RESTORE_FROM_PATHS,
   FIELD_TYPES,
   FIELD_VALIDATE_FN,
-} from "./FormiField.ts";
+} from "./FormiField.contants.ts";
 import type {
   TFormiFieldTree,
   TFormiFieldTreeValue,

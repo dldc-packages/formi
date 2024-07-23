@@ -1,5 +1,5 @@
 import { createReusedField } from "./FormiErreur.ts";
-import { FormiField } from "./FormiField.ts";
+import * as FormiField from "./FormiField.ts";
 import type { TFormiField, TFormiFieldAny } from "./FormiField.types.ts";
 import { createPath, pathFrom, type TPath } from "./tools/Path.ts";
 

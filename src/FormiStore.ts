@@ -6,7 +6,7 @@ import {
   createInternalUnhandledAction,
   createValidateSuccessWithoutValue,
 } from "./FormiErreur.ts";
-import { FormiField } from "./FormiField.ts";
+import * as FormiField from "./FormiField.ts";
 import type { TFormiFieldAny, TInputBase } from "./FormiField.types.ts";
 import {
   type TFormiFieldTree,
