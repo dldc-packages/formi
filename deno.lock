@@ -6,8 +6,7 @@
       "jsr:@dldc/pubsub@^7.0.1": "jsr:@dldc/pubsub@7.0.1",
       "jsr:@std/assert@^0.225.2": "jsr:@std/assert@0.225.2",
       "jsr:@std/expect@^0.224.1": "jsr:@std/expect@0.224.1",
-      "jsr:@std/internal@^0.225.1": "jsr:@std/internal@0.225.1",
-      "npm:zod@^3.23.8": "npm:zod@3.23.8"
+      "jsr:@std/internal@^0.225.1": "jsr:@std/internal@0.225.1"
     },
     "jsr": {
       "@dldc/erreur@7.1.1": {
@@ -32,12 +31,6 @@
       "@std/internal@0.225.1": {
         "integrity": "7d8a812be88c2792f15ab9cf46911e521ccca50435948a8f24df5cefda96bde9"
       }
-    },
-    "npm": {
-      "zod@3.23.8": {
-        "integrity": "sha512-XBx9AXhXktjUqnepgTiE5flcKIYWi/rme0Eaj+5Y0lftuGBq+jyRu/md4WnuxqgP1ubdpNCsYEYPxrzVHD8d6g==",
-        "dependencies": {}
-      }
     }
   },
   "remote": {},
@@ -45,8 +38,7 @@
     "dependencies": [
       "jsr:@dldc/erreur@^7.1.1",
       "jsr:@dldc/pubsub@^7.0.1",
-      "jsr:@std/expect@^0.224.1",
-      "npm:zod@^3.23.8"
+      "jsr:@std/expect@^0.224.1"
     ]
   }
 }

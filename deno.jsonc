@@ -5,8 +5,7 @@
   "imports": {
     "@dldc/erreur": "jsr:@dldc/erreur@^7.1.1",
     "@dldc/pubsub": "jsr:@dldc/pubsub@^7.0.1",
-    "@std/expect": "jsr:@std/expect@^0.224.1",
-    "zod": "npm:zod@^3.23.8"
+    "@std/expect": "jsr:@std/expect@^0.224.1"
   },
   "compilerOptions": {
     "lib": [

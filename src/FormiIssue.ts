@@ -1,4 +1,3 @@
-import type { ZodIssue } from "zod";
 import type { TRawPath } from "./tools/Path.ts";
 
 export type TFormiIssuesItem<Issue> = { path: TRawPath; issues: Array<Issue> };
@@ -10,18 +9,18 @@ export type TFormiIssueBase =
   | { kind: "MissingField" };
 
 export type TFormiIssueSingle = { kind: "UnexpectedMultipleValues" };
-export type TFormiIssueZod = TFormiIssueBase | {
-  kind: "ZodIssue";
-  issue: ZodIssue;
-};
 export type TFormiIssueNotFile = TFormiIssueBase | { kind: "UnexpectedFile" };
-export type TFormiIssueNotString = TFormiIssueBase | {
-  kind: "UnexpectedString";
-};
-export type TFormiIssueNumber = TFormiIssueBase | {
-  kind: "InvalidNumber";
-  value: string;
-};
+export type TFormiIssueNotString =
+  | TFormiIssueBase
+  | {
+      kind: "UnexpectedString";
+    };
+export type TFormiIssueNumber =
+  | TFormiIssueBase
+  | {
+      kind: "InvalidNumber";
+      value: string;
+    };
 export type TFormiIssueNonEmptyFile = TFormiIssueBase | { kind: "EmptyFile" };
 
 export type TFormiIssue =
@@ -30,5 +29,4 @@ export type TFormiIssue =
   | TFormiIssueNotFile
   | TFormiIssueNotString
   | TFormiIssueNumber
-  | TFormiIssueNonEmptyFile
-  | TFormiIssueZod;
+  | TFormiIssueNonEmptyFile;
