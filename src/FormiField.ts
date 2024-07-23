@@ -102,7 +102,7 @@ function create<Value, Issue, Children extends TFormiFieldTree>({
   }
 
   function validate<NextValue = Value, NextIssue = never>(
-    validateFn: TValidateFn<Value, NextValue, Issue | NextIssue>
+    validateFn: TValidateFn<Value, NextValue, Issue | NextIssue>,
   ): TFormiField<NextValue, Issue | NextIssue, Children> {
     const nextValidate = (input: any) => {
       const prev = currentValidateFn(input);
@@ -120,10 +120,11 @@ function create<Value, Issue, Children extends TFormiFieldTree>({
   }
 
   function withChildren(
-    update: Children | TChildrenUpdateFn<Children>
+    update: Children | TChildrenUpdateFn<Children>,
   ): TFormiField<Value, Issue, Children> {
-    const nextChildren =
-      typeof update === "function" ? update(children) : update;
+    const nextChildren = typeof update === "function"
+      ? update(children)
+      : update;
     return create({
       key: self.key,
       children: nextChildren,
@@ -197,7 +198,7 @@ function nonEmptyfile(): TFormiField<File, TNonEmptyFileIssues, null> {
 }
 
 function group<Children extends TFormiFieldTree>(
-  children: Children
+  children: Children,
 ): TFormiField<TFormiFieldTreeValue<Children>, TFormiIssueBase, Children> {
   return create<TFormiFieldTreeValue<Children>, TFormiIssueBase, Children>({
     key: createFormiKey(),
@@ -209,14 +210,15 @@ function group<Children extends TFormiFieldTree>(
 
 function repeat<Child extends TFormiFieldTree>(
   child: Child,
-  initialCount: number = 1
+  initialCount: number = 1,
 ): TFormiField<
   Array<TFormiFieldTreeValue<Child>>,
   TFormiIssueBase,
   Array<Child>
 > {
-  const initialChildren = Array.from({ length: initialCount }, () =>
-    cloneFormiFieldTree(child)
+  const initialChildren = Array.from(
+    { length: initialCount },
+    () => cloneFormiFieldTree(child),
   );
   return create<
     Array<TFormiFieldTreeValue<Child>>,
@@ -234,7 +236,7 @@ function repeat<Child extends TFormiFieldTree>(
 
 function restoreRepeat<Child extends TFormiFieldTree>(
   child: Child,
-  paths: ReadonlyArray<TPath>
+  paths: ReadonlyArray<TPath>,
 ): Array<Child> {
   let size = 0;
   const pathsByIndex = new Map<number, Array<TPath>>();
@@ -256,7 +258,7 @@ function restoreRepeat<Child extends TFormiFieldTree>(
     (child, index) => {
       const paths = pathsByIndex.get(index) ?? [];
       return restoreFormiFieldTreeFromPaths(child, paths);
-    }
+    },
   );
 }
 
@@ -269,13 +271,13 @@ function getValidateFn(field: TFormiFieldAny): TValidateFn<any, any, any> {
 }
 
 function getRestoreFromPaths(
-  field: TFormiFieldAny
+  field: TFormiFieldAny,
 ): TRestoreFromPaths<any> | null {
   return field[FIELD_RESTORE_FROM_PATHS];
 }
 
 function isSingleValue(
-  input: TInputBase<null>
+  input: TInputBase<null>,
 ): TValidateResult<FormDataEntryValue | null, TFormiIssueSingle> {
   if (input.values === null) {
     return success(null);
@@ -290,7 +292,7 @@ function isSingleValue(
 }
 
 function isNotNull<Value>(
-  input: Value | null
+  input: Value | null,
 ): TValidateResult<Value, TFormiIssueBase> {
   if (input === null) {
     return failure<TFormiIssueBase>({ kind: "MissingField" });
@@ -299,7 +301,7 @@ function isNotNull<Value>(
 }
 
 function isNotFile<Value>(
-  input: Value | File
+  input: Value | File,
 ): TValidateResult<Value, TFormiIssueNotFile> {
   if (input instanceof FileOrBlob) {
     return failure<TFormiIssueNotFile>({ kind: "UnexpectedFile" });
@@ -308,7 +310,7 @@ function isNotFile<Value>(
 }
 
 function isNumber(
-  input: string | null
+  input: string | null,
 ): TValidateResult<number | null, TFormiIssueNumber> {
   if (input === "" || input === null) {
     return success<number | null>(null);
@@ -331,7 +333,7 @@ function isDefined(input: any): TValidateResult<boolean, TFormiIssueBase> {
 }
 
 function isFile(
-  entry: FormDataEntryValue | null
+  entry: FormDataEntryValue | null,
 ): TValidateResult<File, TFormiIssueNotString> {
   if (entry === null) {
     return { success: false, issue: { kind: "MissingField" } };
@@ -343,7 +345,7 @@ function isFile(
 }
 
 function isNonEmptyFile(
-  input: File
+  input: File,
 ): TValidateResult<File, TFormiIssueNonEmptyFile> {
   if (input.size === 0) {
     return failure<TFormiIssueNonEmptyFile>({ kind: "EmptyFile" });
@@ -356,7 +358,7 @@ export function success<Value>(value: Value): TValidateSuccess<Value> {
 }
 
 export function failure<Issue>(
-  issue?: Issue | Array<Issue>
+  issue?: Issue | Array<Issue>,
 ): TValidateFailure<Issue> {
   if (issue === undefined) {
     return { success: false };

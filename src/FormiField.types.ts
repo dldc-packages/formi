@@ -26,7 +26,7 @@ export type TValidateResult<Value, Issue> =
   | TValidateFailure<Issue>;
 
 export type TValidateFn<Input, Value, Issue> = (
-  value: Input
+  value: Input,
 ) => TValidateResult<Value, Issue>;
 
 export type TChildrenUpdateFn<Children> = (prev: Children) => Children;
@@ -40,20 +40,20 @@ export type TFormiFieldIssue<F extends TFormiFieldAny> =
 export type TFormiFieldChildren<F extends TFormiFieldAny> = F["children"];
 
 export type TRestoreFromPaths<Children extends TFormiFieldTree> = (
-  paths: ReadonlyArray<TPath>
+  paths: ReadonlyArray<TPath>,
 ) => Children;
 
 export type TValidate<Value, Issue, Children extends TFormiFieldTree = null> = <
   NextValue = Value,
-  NextIssue = never
+  NextIssue = never,
 >(
-  validateFn: TValidateFn<Value, NextValue, Issue | NextIssue>
+  validateFn: TValidateFn<Value, NextValue, Issue | NextIssue>,
 ) => TFormiField<NextValue, Issue | NextIssue, Children>;
 
 export interface TFormiField<
   Value,
   Issue,
-  Children extends TFormiFieldTree = null
+  Children extends TFormiFieldTree = null,
 > {
   readonly [FIELD_RESTORE_FROM_PATHS]: TRestoreFromPaths<Children> | null;
   readonly [FIELD_VALIDATE_FN]: TValidateFn<any, Value, Issue>;
@@ -69,14 +69,14 @@ export interface TFormiField<
     Children
   >;
   readonly withChildren: (
-    children: Children | TChildrenUpdateFn<Children>
+    children: Children | TChildrenUpdateFn<Children>,
   ) => TFormiField<Value, Issue, Children>;
 }
 
 export interface ICreateFieldOptions<
   Value,
   Issue,
-  Children extends TFormiFieldTree
+  Children extends TFormiFieldTree,
 > {
   key: TFormiKey;
   children: Children;

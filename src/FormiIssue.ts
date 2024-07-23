@@ -13,14 +13,14 @@ export type TFormiIssueNotFile = TFormiIssueBase | { kind: "UnexpectedFile" };
 export type TFormiIssueNotString =
   | TFormiIssueBase
   | {
-      kind: "UnexpectedString";
-    };
+    kind: "UnexpectedString";
+  };
 export type TFormiIssueNumber =
   | TFormiIssueBase
   | {
-      kind: "InvalidNumber";
-      value: string;
-    };
+    kind: "InvalidNumber";
+    value: string;
+  };
 export type TFormiIssueNonEmptyFile = TFormiIssueBase | { kind: "EmptyFile" };
 
 export type TFormiIssue =
