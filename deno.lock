@@ -13,7 +13,10 @@
         "integrity": "9ba954ae0654e4ed003959c77aaa009fdf6c64f60bf4cfec33b134556ab0d6da"
       },
       "@dldc/pubsub@7.0.1": {
-        "integrity": "6bbc57eba90b27925945799d7cfc3c25cc85a6f215d467c413dc5a7c3c3fe9eb"
+        "integrity": "6bbc57eba90b27925945799d7cfc3c25cc85a6f215d467c413dc5a7c3c3fe9eb",
+        "dependencies": [
+          "jsr:@dldc/erreur@^7.1.1"
+        ]
       },
       "@std/assert@0.225.3": {
         "integrity": "b3c2847aecf6955b50644cdb9cf072004ea3d1998dd7579fc0acb99dbb23bd4f",
