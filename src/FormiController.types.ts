@@ -43,6 +43,7 @@ export interface IFormiController<Tree extends TFormiFieldTree> {
   readonly getState: () => IFormiState;
   readonly subscribe: SubscribeMethod<IFormiState>;
 
+  readonly setData: (data: FormData) => void;
   readonly submit: (data: FormData) => void;
   readonly getResult: () => TFormiResult<Tree>;
   readonly setIssues: (issues: TFormiIssues<any>) => void;

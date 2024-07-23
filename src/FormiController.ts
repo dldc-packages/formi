@@ -43,6 +43,7 @@ export function createFormiController<Tree extends TFormiFieldTree>({
 
     submit,
     getResult,
+    setData,
     setIssues,
     setOnSubmit,
     setFields,
@@ -113,6 +114,10 @@ export function createFormiController<Tree extends TFormiFieldTree>({
     if (onSubmit && actions) {
       onSubmit({ value, formData: data }, actions);
     }
+  }
+
+  function setData(data: FormData) {
+    store.dispatch({ type: "Mount", data });
   }
 
   function handleSubmit(event: SubmitEvent) {
